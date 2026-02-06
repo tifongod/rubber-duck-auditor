@@ -18,6 +18,7 @@ Your objective is to **execute all RDA steps end-to-end** (00 → 09 + executive
 
 Before doing anything else, read and follow:
 - `skills/_shared/rda-common-rules.md`
+- `skills/_shared/GUARDRAILS.md`
 - `skills/_shared/REPORT_TEMPLATE.md`
 - `skills/_shared/RISK_RUBRIC.md`
 - `skills/_shared/PIPELINE.md`
