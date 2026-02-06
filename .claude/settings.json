@@ -1,0 +1,5 @@
+{
+  "enabledPlugins": {
+    "rda@rubber-duck-auditor": true
+  }
+}

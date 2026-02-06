@@ -7,13 +7,22 @@ All step-specific prompts must **reference and follow** these rules.
 
 ## 1) Inputs & Scope
 
+### Run root (`<run_root>`)
+- `<run_root>` is the **directory where the prompt is executed** (the agent’s current working directory).
+- All paths in outputs (reports, evidence pointers, referenced docs) MUST be **relative to `<run_root>`**.
+- Absolute paths are strictly prohibited:
+    - no leading `/` (e.g., `/Users/...`, `/home/...`)
+    - no Windows drive prefixes (e.g., `C:\...`)
+    - no machine-specific home paths
+- If a tool returns paths like `./internal/app/server.go`, normalize by stripping the leading `./`.
+
 ### Target directory (`<target>`)
 - The audit operates on a **single directory scope**: `<target>` is the **root boundary**.
 - The agent must analyze **everything inside `<target>` and all subdirectories**.
 - The agent **must not** read, search, infer, or reference files **outside** `<target>`.
 
 ### Default scope
-- If `<target>` is not provided, the agent must start from the **current working directory** (`.`) as `<target>`.
+- If `<target>` is not provided, the agent must use `.` as `<target>` **relative to `<run_root>`**.
 
 ### No scope expansion
 - Do not "peek" into parent folders, sibling services, or repository-wide docs unless they are **inside `<target>`**.
@@ -31,7 +40,7 @@ All step-specific prompts must **reference and follow** these rules.
 
 ## 2) Mandatory Pre-Reads (Context)
 
-Before producing any new report, the agent must read:
+Before producing any new report, the agent must read (paths are relative to `<run_root>`):
 
 ### A) Existing reports directory
 - Read **all** files under:
@@ -60,7 +69,7 @@ Before producing any new report, the agent must read:
 ## 3) Output Requirements
 
 ### Report location (mandatory)
-- The agent must write a Markdown report to:
+- The agent must write a Markdown report to (path relative to `<run_root>`):
     - `<target>/docs/rda/reports/<REPORT_NAME>.md`
 
 ### Report naming
@@ -92,13 +101,16 @@ The report must be written as an **iterative update**:
 ## 5) Evidence & Precision
 
 ### Evidence format (mandatory)
-- **File path:** Use format `<file>:<line-range>` (e.g., `internal/app/server.go:45-48`)
+- **File path:** Use format `<relative-path>:<line-range>`, where `<relative-path>` is relative to `<run_root>` (e.g., `internal/app/server.go:45-48` OR `services/foo/internal/app/server.go:45-48` depending on where `<target>` is rooted).
+    - Must NOT start with `/` or contain machine-specific prefixes.
+    - If a tool returns `./...`, strip the leading `./`.
 - **Short excerpt:** ≤3 lines ONLY, in **inline format** (never paste full functions or large blocks)
 - **NO markdown code blocks:** NEVER use ` ``` ` blocks in report body (per report style constraint)
 - **Correct format example:** "Evidence: config/loader.go:23-25 — validates required fields with `validator.Struct(cfg)` before use."
 - For long evidence: Use "see lines 45-68" instead of pasting code
 - Every non-trivial claim must include: file path + short excerpt OR line reference
 - **Inline code** (single backticks like `variableName`) is acceptable for identifiers
+- Any reference to `<target>`-scoped locations MUST still follow the `<run_root>`-relative rule (i.e., write `<target>/...` as a relative path, never an absolute filesystem path).
 
 ### Confidence levels (binary only)
 - **VERIFIED:** Direct evidence observed in files within `<target>/`
@@ -108,8 +120,8 @@ The report must be written as an **iterative update**:
 ### Avoid speculation
 - If something is unclear: mark as **GAP** and continue
 - **NEVER ask clarifying questions** — this is audit mode, not interactive mode
-  - ❌ Wrong: "Should I use approach A or B?"
-  - ✅ Correct: "Approach A is standard for MAANG services. Marked approach choice as GAP pending ADR."
+    - ❌ Wrong: "Should I use approach A or B?"
+    - ✅ Correct: "Approach A is standard for MAANG services. Marked approach choice as GAP pending ADR."
 - Best-effort delivery is preferred over asking questions
 - List what evidence would be needed to verify (for follow-up)
 
@@ -150,7 +162,7 @@ The agent **MAY** spawn up to **15 subagents** to improve throughput and depth o
 - **Same boundary:** subagents must treat `<target>` as a hard scope boundary (no reads/search outside `<target>`).
 - **Same pre-reads:** subagents must follow the same mandatory pre-read rules if their task depends on that context.
 - **No file writes:** subagents must not write or modify any files. They return findings to the main agent only.
-- **Evidence-first:** every subagent output must include concrete evidence pointers (paths/symbols/keys).
+- **Evidence-first:** every subagent output must include concrete evidence pointers (paths/symbols/keys) and those paths MUST be relative to `<run_root>`.
 - **No duplication:** each subagent must have a clearly scoped objective to avoid redundant work.
 - **Advisory only:** subagent outputs are suggestions; the main agent must verify evidence before promoting items to P0/P1.
 
@@ -168,19 +180,20 @@ The agent **MAY** spawn up to **15 subagents** to improve throughput and depth o
 Every report should contain, at minimum:
 
 1. **Run Metadata**
-    - `<target>`
-    - audit step name
-    - date/time
+- `<run_root>`
+- `<target>`
+- audit step name
+- date/time
 2. **Executive Summary**
-    - key risks + readiness verdict (brief)
+- key risks + readiness verdict (brief)
 3. **Delta vs Previous Run**
 4. **Findings**
-    - grouped by the step’s scope
-    - each finding includes: impact, evidence, recommendation
+- grouped by the step’s scope
+- each finding includes: impact, evidence, recommendation
 5. **Previously Critical Findings Status**
 6. **Action Plan**
-    - ordered by priority (P0/P1/P2)
-    - effort estimate (S/M/L) optional
+- ordered by priority (P0/P1/P2)
+- effort estimate (S/M/L) optional
 
 ---
 
@@ -192,4 +205,5 @@ Every report should contain, at minimum:
 - [ ] Read `ARCHITECTURAL_DECISIONS.md` and respect intent, but critique if needed.
 - [ ] Write a Markdown report into `docs/rda/reports`.
 - [ ] Evidence-first, delta-first, no speculative “fixed”.
+- [ ] All paths in the report are relative to `<run_root>` (no absolute paths, no `./` prefix).
 - [ ] (Optional) If using subagents: max 15, same `<target>` boundary, no file writes; main agent consolidates and owns final output.
