@@ -13,25 +13,7 @@
       "author": {
         "name": "Denis Kolpakov",
         "email": "dkolp.com@gmail.com"
-      },
-      "keywords": [
-        "production-readiness",
-        "audit",
-        "security",
-        "observability",
-        "reliability",
-        "performance",
-        "testing",
-        "devops",
-        "sre",
-        "quality",
-        "architecture",
-        "configuration",
-        "integrations",
-        "data",
-        "assessment",
-        "maang"
-      ]
+      }
     }
   ]
 }

@@ -9,5 +9,22 @@
   "homepage": "https://github.com/tifongod/rubber-duck-auditor",
   "repository": "https://github.com/tifongod/rubber-duck-auditor",
   "license": "MIT",
-  "keywords": []
+  "keywords": [
+    "production-readiness",
+    "audit",
+    "security",
+    "observability",
+    "reliability",
+    "performance",
+    "testing",
+    "devops",
+    "sre",
+    "quality",
+    "architecture",
+    "configuration",
+    "integrations",
+    "data",
+    "assessment",
+    "maang"
+  ]
 }
