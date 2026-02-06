@@ -34,6 +34,36 @@ Start a new Claude Code session and trigger an RDA skill. Examples:
 - "Audit the observability setup for this repo"
 - "Run the full RDA audit pipeline"
 
+## Updating the Plugin
+
+When a new version is released, update the plugin to get the latest features and improvements:
+
+### Option 1: Reinstall (Recommended)
+
+```
+/plugin uninstall rda
+/plugin install rda@rubber-duck-auditor
+```
+
+### Option 2: Update marketplace and reinstall
+
+If the marketplace entry is outdated, refresh it first:
+
+```
+/plugin marketplace remove rubber-duck-auditor
+/plugin marketplace add tifongod/rubber-duck-auditor
+/plugin uninstall rda
+/plugin install rda@rubber-duck-auditor
+```
+
+### Check current version
+
+After updating, verify the version in any generated report's metadata section, or check:
+
+```
+/plugin list
+```
+
 ## Notes
 
 - **Plugin caching:** Claude Code copies the plugin directory to a cache. The plugin must not depend on files outside its source directory.
