@@ -24,7 +24,7 @@
 - If decisions file missing/unreadable: **GAP** — <impact>
 
 ## 2. Scope & Guardrails Confirmation
-- ✅ **Inspection limited to:** <TARGET_SERVICE_PATH> (e.g. `services/qql-runtime`)
+- ✅ **Inspection limited to:** <TARGET_SERVICE_PATH> (e.g. `services/some-service`)
 - ✅ **No external code opened:** CONFIRMED
 - ✅ **No files outside TARGET_SERVICE_PATH accessed:** CONFIRMED
 

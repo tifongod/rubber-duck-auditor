@@ -1,4 +1,4 @@
-# SKILL: performance
+# SKILL: rda-performance
 
 # Performance & Capacity
 
@@ -14,55 +14,12 @@ This step must produce a practical plan: what to measure, what to optimize first
 
 Before doing anything else, read and follow:
 - `skills/_shared/rda-common-rules.md`
+- `skills/_shared/GUARDRAILS.md`
 - `skills/_shared/REPORT_TEMPLATE.md`
 - `skills/_shared/RISK_RUBRIC.md`
 - `skills/_shared/PIPELINE.md`
 
 If anything below conflicts with shared rules, shared rules win.
-
----
-
-## Hard Guardrails (NON-NEGOTIABLE)
-
-1) **Scope Boundary**
-- `TARGET_SERVICE_PATH = <target>` (if not provided, use `.`)
-- You MUST NOT read, list, or analyze any files outside this path.
-
-2) **Strictly Prohibited**
-- Analyzing the entire monorepo.
-- Scanning/listing/reading files outside `TARGET_SERVICE_PATH`.
-- Producing an overview/map of the monorepo or enumerating other services outside `TARGET_SERVICE_PATH`.
-- Opening shared/common libraries outside `TARGET_SERVICE_PATH`.
-- If code inside the service imports modules outside boundary, you may ONLY record the dependency (import path/config reference) as **EXTERNAL DEP** and mark unknowns as **GAP**. You MUST NOT open external code.
-
-3) **No Code Modifications**
-- Analysis + report only.
-
-4) **Missing Info Policy**
-- If information is outside boundary or unavailable, record as **GAP** and continue.
-
----
-
-## Rerun / Anti-Copy Requirements (MANDATORY)
-
-### A) Iteration Without Copy-Paste
-- You MUST treat prior reports in `<target>/docs/rda/reports/` as context and previous-run state.
-- You MUST NOT copy prior content verbatim.
-- You MUST draft findings based on inspection in this run, then reconcile with prior report(s) and produce a proper delta.
-
-### B) Mandatory Run Metadata
-Every report MUST include:
-- **Timestamp (UTC)**
-- **Git commit hash** for `TARGET_SERVICE_PATH` (or GAP)
-- **Change Detection summary**
-    - Preferred: `git diff -- <target>` or `git status --porcelain -- <target>`
-    - If git commands unavailable: GAP
-
-### C) Mandatory Delta Section
-Every report MUST include "Delta vs previous run":
-- If prior report existed: 3–10 bullets summarizing differences
-- If no material changes: "No material changes detected" + 3–5 items re-checked
-- If first run: "First run — no prior report to compare"
 
 ---
 
@@ -83,6 +40,26 @@ Every report MUST include "Delta vs previous run":
 - data handling (SCD2, merge engines, dedup)
 - reliability & observability (concurrency/backpressure, metrics)
   If missing: record as GAP and proceed.
+
+### Fast-Path for Unchanged Target
+
+If **both** of the following are true:
+1. `git diff -- <target>` returns empty (no uncommitted changes)
+2. `git status --porcelain -- <target>` returns empty (no untracked files)
+
+Then you MAY take the fast-path:
+- Read the previous report for this step (if exists)
+- Confirm it has a "No material changes" delta section OR recent critical items
+- Update **only** the Run Metadata:
+  - New timestamp (UTC)
+  - Same commit hash (if unchanged)
+  - Change Detection: "No code changes detected via git diff/status"
+- Add note in Delta section: "Fast-path: no code changes detected since last run (commit XXXXX). Prior findings re-validated without deep re-inspection."
+- **EXCEPTION:** If prior report has **P0 items marked "not fixed"**, you MUST re-inspect those specific areas (no fast-path for P0s)
+
+If the prior report does NOT exist, or has P0s, or you are uncertain: skip fast-path and perform full inspection.
+
+**Rationale:** Unchanged code → unchanged findings. Fast-path saves ~70% of agent time on reruns for stable codebases.
 
 ---
 
@@ -125,6 +102,26 @@ Within `TARGET_SERVICE_PATH` ONLY.
 
 ---
 
+## Tool Usage (MANDATORY)
+
+**DO use these tools:**
+- ✅ **Glob** for file patterns: `**/*.go`, `internal/*/`, `cmd/*/main.go`, `**/*.{yaml,yml}`
+- ✅ **Grep** for content search:
+  - `pattern="timeout"`, `--type go`, `--glob "*.yaml"`
+  - Use `output_mode="files_with_matches"` for listing, `output_mode="content"` for excerpts
+- ✅ **Read** for known file paths (always prefer Read over cat/head/tail)
+
+**DO NOT use:**
+- ❌ Bash commands: `ls -R`, `find .`, `grep`, `cat`, `head`, `tail`, `sed`, `awk`
+- ❌ Glob without extension filter: `**/*` (too broad, lists everything)
+- ❌ Reading files outside `<target>/` (verify path starts with target first)
+
+**Rationale:** Dedicated tools provide better permission handling, are faster, and are auditable by the user.
+
+See `skills/_shared/rda-common-rules.md` lines 22-29 for full details.
+
+---
+
 ## Method
 
 Answer each checklist question with:
@@ -149,16 +146,6 @@ Checklist:
 
 Additionally:
 - Where possible, compute *qualitative* worst-case behavior (no microbenchmarks), e.g. “retries × batch size × timeout → max stall”.
-
----
-
-## Architectural Decisions Awareness
-
-When findings relate to intentional decisions:
-- Reference `ARCH_DECISIONS_PATH` (quote short excerpt + section heading).
-- Verify code/config aligns with intent.
-- If drift: label **DRIFT** with impact and fix.
-- If a decision is performance-dangerous: label **DECISION RISK** and propose safer alternatives.
 
 ---
 
@@ -266,18 +253,6 @@ Prefer actions that are measurable: “Add metric X”, “Add bound Y”, “Re
 - If prior report existed: 3–10 bullets on differences
 - If first run: "First run — no prior report to compare"
 - If no material changes: "No material changes detected" + 3–5 re-checked items
-
----
-
-## Prioritization Rubric
-- **P0:** latency/throughput issues that can cause outages, runaway costs, unbounded resource growth, or stuck pipelines
-- **P1:** significant efficiency and predictability improvements, clearer budgets/limits, better capacity metrics
-- **P2:** optimizations and cleanup with smaller ROI
-
----
-
-## No Speculation Rule
-All assertions MUST be tied to evidence (file path + excerpt/line reference). If evidence is unavailable, label as **GAP** and continue.
 
 ---
 

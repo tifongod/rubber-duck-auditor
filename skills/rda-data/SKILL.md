@@ -1,4 +1,4 @@
-# SKILL: data
+# SKILL: rda-data
 
 # Data Handling
 
@@ -12,6 +12,7 @@ You are a **MAANG Principal Backend Engineer** auditing production readiness of 
 
 Before doing anything else, read and follow:
 - `skills/_shared/rda-common-rules.md`
+- `skills/_shared/GUARDRAILS.md`
 - `skills/_shared/REPORT_TEMPLATE.md`
 - `skills/_shared/RISK_RUBRIC.md`
 - `skills/_shared/PIPELINE.md`
@@ -20,52 +21,10 @@ If anything below conflicts with shared rules, shared rules win.
 
 ---
 
-## Hard Guardrails (NON-NEGOTIABLE)
-
-1. **Scope Boundary:**
-    - `TARGET_SERVICE_PATH = <target>` (if not provided, use `.`)
-    - You MUST NOT read, list, or analyze any files outside this path.
-
-2. **Strictly Prohibited:**
-    - Analyzing the entire monorepo.
-    - Scanning/listing/reading files outside `TARGET_SERVICE_PATH`.
-    - Producing an overview/map of the monorepo or enumerating other services outside `TARGET_SERVICE_PATH`.
-    - Opening shared/common libraries outside `TARGET_SERVICE_PATH`.
-    - If code inside the service imports modules outside boundary, you may ONLY record the dependency (import path/config reference) as **EXTERNAL DEP** and mark unknowns as **GAP**. You MUST NOT open external code.
-
-3. **No Code Modifications:** Analysis + reports only.
-
-4. **Missing Information:** If information is outside boundary or unavailable, record as **GAP** and continue.
-
----
-
-## Rerun / Anti-Copy Requirements (MANDATORY)
-
-### A) Iteration Without Copy-Paste
-- You MUST respect prior reports in `<target>/docs/rda/reports/**` as context and prior decisions (reports evolve over time).
-- You MUST NOT copy prior report content verbatim.
-- You MUST draft findings based on code/schema inspection in this run, then reconcile with prior report(s) and produce a proper delta.
-
-### B) Mandatory Run Metadata
-Every report MUST include a "Run Metadata" section with:
-- **Timestamp (UTC)**
-- **Git commit hash** for `TARGET_SERVICE_PATH` (or GAP if unavailable)
-- **Change Detection summary:**
-    - Preferred: `git diff -- <target>` or `git status --porcelain -- <target>`
-    - If git commands unavailable: record as GAP
-
-### C) Mandatory Delta Section
-Every report MUST include "Delta vs previous run":
-- If prior report existed: 3–10 bullets summarizing differences
-- If no material changes: explicitly state "No material changes detected" and list 3–5 items re-checked
-- If first run: "First run — no prior report to compare"
-
----
-
 ## Inputs
 
 - `<target>` (optional): service root directory. If not provided, use `.`.
-    - Recommended example for this service in a monorepo: `<target> = services/qql-runtime`
+    - Recommended example for this service in a monorepo: `<target> = services/some-service`
 
 ### Mandatory Context (Read FIRST)
 1. **ARCH_DECISIONS_PATH:** `<target>/docs/rda/ARCHITECTURAL_DECISIONS.md`
@@ -82,6 +41,26 @@ Every report MUST include "Delta vs previous run":
     - Use DynamoDB / ClickHouse integration details and config points.
 
 If any report is missing: record as **GAP** and scan repository/migration directories inside `TARGET_SERVICE_PATH`.
+
+### Fast-Path for Unchanged Target
+
+If **both** of the following are true:
+1. `git diff -- <target>` returns empty (no uncommitted changes)
+2. `git status --porcelain -- <target>` returns empty (no untracked files)
+
+Then you MAY take the fast-path:
+- Read the previous report for this step (if exists)
+- Confirm it has a "No material changes" delta section OR recent critical items
+- Update **only** the Run Metadata:
+  - New timestamp (UTC)
+  - Same commit hash (if unchanged)
+  - Change Detection: "No code changes detected via git diff/status"
+- Add note in Delta section: "Fast-path: no code changes detected since last run (commit XXXXX). Prior findings re-validated without deep re-inspection."
+- **EXCEPTION:** If prior report has **P0 items marked "not fixed"**, you MUST re-inspect those specific areas (no fast-path for P0s)
+
+If the prior report does NOT exist, or has P0s, or you are uncertain: skip fast-path and perform full inspection.
+
+**Rationale:** Unchanged code → unchanged findings. Fast-path saves ~70% of agent time on reruns for stable codebases.
 
 ---
 
@@ -123,6 +102,26 @@ Use file locations from prior reports where possible. Within `TARGET_SERVICE_PAT
 
 ---
 
+## Tool Usage (MANDATORY)
+
+**DO use these tools:**
+- ✅ **Glob** for file patterns: `**/*.go`, `internal/*/`, `cmd/*/main.go`, `**/*.{yaml,yml}`
+- ✅ **Grep** for content search:
+  - `pattern="timeout"`, `--type go`, `--glob "*.yaml"`
+  - Use `output_mode="files_with_matches"` for listing, `output_mode="content"` for excerpts
+- ✅ **Read** for known file paths (always prefer Read over cat/head/tail)
+
+**DO NOT use:**
+- ❌ Bash commands: `ls -R`, `find .`, `grep`, `cat`, `head`, `tail`, `sed`, `awk`
+- ❌ Glob without extension filter: `**/*` (too broad, lists everything)
+- ❌ Reading files outside `<target>/` (verify path starts with target first)
+
+**Rationale:** Dedicated tools provide better permission handling, are faster, and are auditable by the user.
+
+See `skills/_shared/rda-common-rules.md` lines 22-29 for full details.
+
+---
+
 ## Method
 
 Complete this checklist with evidence:
@@ -144,23 +143,6 @@ For each answer, provide:
 - **File path(s)** inspected
 - **Short excerpt** or line reference as evidence
 - **Assessment:** CORRECT / CONCERN / RISK
-
----
-
-## Architectural Decisions Awareness (CRITICAL FOR THIS STEP)
-
-If an ADR explicitly governs idempotency/dedup/SCD2 (e.g., "non-atomic idempotency" trade-off), do the following:
-
-1. **Read and summarize the ADR section** relevant to data correctness.
-2. **Verify implementation matches the decision** (pattern, fail-safe behavior, timeouts/visibility handling, dedup assumptions).
-3. **Verify mitigations are in place** (schema keys, merge engine choice, window closure strategy, operational safeguards).
-4. **Evaluate trade-off validity** for production readiness:
-    - Is "data loss worse than duplicates" appropriate here?
-    - Are monitoring/alerting and reconciliation hooks present if duplicates/drift can happen?
-5. **If you see drift or disagree**:
-    - Label as **DRIFT** or **DECISION RISK**
-    - Provide specific evidence
-    - Propose safer alternatives with justification
 
 ---
 
@@ -271,18 +253,6 @@ If no cache detected: state it explicitly with evidence.
 - <If prior report existed: 3-10 bullets on differences>
 - <If first run: "First run — no prior report to compare">
 - <If no material changes: "No material changes detected" + list 3-5 re-checked items>
-
----
-
-## Prioritization Rubric
-- **P0:** Production risk / correctness / security / data loss / outage class
-- **P1:** Significant reliability / operability / maintainability improvements
-- **P2:** Nice-to-have / cleanup / future-proofing
-
----
-
-## No Speculation Rule
-All assertions MUST be tied to evidence (file path + excerpt/line reference). If evidence is unavailable, label as **GAP** and continue.
 
 ---
 
