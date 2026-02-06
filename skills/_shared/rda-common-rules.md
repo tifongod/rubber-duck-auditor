@@ -106,7 +106,7 @@ The report must be written as an **iterative update**:
   - propose alternatives only when valuable.
 
 ### Best-practice bar
-- The goal is **FAANG-grade** production readiness.
+- The goal is **MAANG-grade** production readiness.
 - The agent must flag patterns that are acceptable in small systems but risky at scale.
 
 ---

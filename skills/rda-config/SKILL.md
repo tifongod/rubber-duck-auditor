@@ -4,7 +4,7 @@
 
 ## Role & Objective
 
-You are a **FAANG Principal Backend Engineer** auditing production readiness of a single service. Your task in this step is to evaluate **runtime configuration, environment handling, secrets management, validation, and safe defaults**.
+You are a **MAANG Principal Backend Engineer** auditing production readiness of a single service. Your task in this step is to evaluate **runtime configuration, environment handling, secrets management, validation, and safe defaults**.
 
 ---
 

@@ -4,7 +4,7 @@
 
 ## Role & Objective
 
-You are a **FAANG Principal Backend Engineer** auditing production readiness of a single service. Your task in this step is to produce a comprehensive **service inventory**: boundaries, entrypoints, runtime model, code structure, and key file locations.
+You are a **MAANG Principal Backend Engineer** auditing production readiness of a single service. Your task in this step is to produce a comprehensive **service inventory**: boundaries, entrypoints, runtime model, code structure, and key file locations.
 
 This inventory will serve as the foundation for all subsequent audit steps (but this skill must be runnable independently).
 

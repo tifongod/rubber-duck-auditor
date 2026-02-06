@@ -4,7 +4,7 @@
 
 ## Role & Objective
 
-You are a **FAANG Principal Backend Engineer** auditing production readiness of a single service. Your task in this step is to evaluate **observability: logging, metrics, traces, health checks, SLI/SLO readiness, and diagnosability**.
+You are a **MAANG Principal Backend Engineer** auditing production readiness of a single service. Your task in this step is to evaluate **observability: logging, metrics, traces, health checks, SLI/SLO readiness, and diagnosability**.
 
 ---
 
