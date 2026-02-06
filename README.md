@@ -67,7 +67,7 @@ After updating, verify the version in any generated report's metadata section, o
 ## Notes
 
 - **Plugin caching:** Claude Code copies the plugin directory to a cache. The plugin must not depend on files outside its source directory.
-- **Skills location:** All skills are located in the `skills/` directory and follow a consistent naming pattern (`rda-*`).
+- **Skills location:** All skills are located in the `skills/` directory.
 
 ## For Maintainers
 

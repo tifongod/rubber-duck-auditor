@@ -5,7 +5,7 @@ You are a MAANG Principal Backend Engineer. Your task is to produce an EXECUTIVE
 This skill is reports-only: you MUST NOT inspect source code, configs, manifests, prompts, CI files, or any repository content outside the reports directory.
 
 References (shared standards):
-- skills/_shared/rda-common-rules.md
+- skills/_shared/common-rules.md
 - skills/_shared/RISK_RUBRIC.md
 - skills/_shared/PIPELINE.md
 

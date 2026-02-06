@@ -1,4 +1,4 @@
-# SKILL: rda-audit-pipeline
+# SKILL: audit-pipeline
 
 # Rubber Duck Audit — Full Pipeline (Isolated Steps)
 
@@ -17,7 +17,7 @@ Your objective is to **execute all RDA steps end-to-end** (00 → 09 + executive
 ## Shared Rules (MANDATORY)
 
 Before doing anything else, read and follow:
-- `skills/_shared/rda-common-rules.md`
+- `skills/_shared/common-rules.md`
 - `skills/_shared/GUARDRAILS.md`
 - `skills/_shared/REPORT_TEMPLATE.md`
 - `skills/_shared/RISK_RUBRIC.md`
@@ -184,53 +184,53 @@ The following steps MUST be executed in wave order (see Dependency Waves above).
 
 **Wave 1:**
 1. Step 00 — Inventory
-    - Skill: `rda-inventory`
+    - Skill: `inventory`
     - Output: `<target>/docs/rda/reports/00_service_inventory.md`
 
 **Wave 2 (parallel):**
 2. Step 01 — Architecture & Design
-    - Skill: `rda-architecture`
+    - Skill: `architecture`
     - Output: `<target>/docs/rda/reports/01_architecture_design.md`
 
 3. Step 02 — Configuration & Environment
-    - Skill: `rda-config`
+    - Skill: `config`
     - Output: `<target>/docs/rda/reports/02_configuration_environment.md`
 
 **Wave 3:**
 4. Step 03 — External Integrations
-    - Skill: `rda-integrations`
+    - Skill: `integrations`
     - Output: `<target>/docs/rda/reports/03_external_integrations.md`
 
 **Wave 4 (parallel):**
 5. Step 04 — Data Handling
-    - Skill: `rda-data`
+    - Skill: `data`
     - Output: `<target>/docs/rda/reports/04_data_handling.md`
 
 6. Step 06 — Observability
-    - Skill: `rda-observability`
+    - Skill: `observability`
     - Output: `<target>/docs/rda/reports/06_observability.md`
 
 **Wave 5:**
 7. Step 05 — Reliability & Failure Handling
-    - Skill: `rda-reliability`
+    - Skill: `reliability`
     - Output: `<target>/docs/rda/reports/05_reliability_failure_handling.md`
 
 **Wave 6 (parallel):**
 8. Step 07 — Testing, Delivery & Maintainability
-    - Skill: `rda-quality`
+    - Skill: `quality`
     - Output: `<target>/docs/rda/reports/07_testing_delivery_maintainability.md`
 
 9. Step 08 — Security & Privacy
-    - Skill: `rda-security`
+    - Skill: `security`
     - Output: `<target>/docs/rda/reports/08_security_and_privacy.md`
 
 10. Step 09 — Performance & Capacity
-    - Skill: `rda-performance`
+    - Skill: `performance`
     - Output: `<target>/docs/rda/reports/09_performance_and_capacity.md`
 
 **Wave 7:**
 11. Executive Summary
-    - Skill: `rda-exec-summary`
+    - Skill: `exec-summary`
     - Output: `<target>/docs/rda/summary/00_summary.md`
     - Reads reports only (no code inspection)
 
@@ -245,7 +245,7 @@ If any step skill is missing, the pipeline must:
 For each step run (regardless of mode):
 
 1. **Load shared rules**
-    - Must explicitly follow `rda-common-rules.md`, `REPORT_TEMPLATE.md`, `RISK_RUBRIC.md`, `PIPELINE.md`.
+    - Must explicitly follow `common-rules.md`, `REPORT_TEMPLATE.md`, `RISK_RUBRIC.md`, `PIPELINE.md`.
 
 2. **Respect boundary**
     - Only read files within `<target>`.
@@ -301,7 +301,7 @@ After each wave completes, you MUST verify all expected reports exist before pro
 ## Pipeline Quality Gates (MANDATORY)
 
 After each wave completes and reports are verified to exist, validate (lightweight, in-scope) that each produced report contains:
-- Run Metadata (timestamp, git commit or GAP, change detection or GAP)
+- Run Metadata (timestamp, git commit or GAP)
 - Scope & guardrails confirmation
 - Findings split into strengths/risks/gaps
 - Action items with P0/P1/P2

@@ -59,9 +59,6 @@ DO NOT duplicate this content in step prompts.
 Every report MUST include a "Run Metadata" section with:
 - **Timestamp (UTC):** `YYYY-MM-DD HH:MM:SS UTC`
 - **Git commit hash** for `<target>` (or GAP if unavailable)
-- **Change Detection summary:**
-  - Preferred: `git diff -- <target>` or `git status --porcelain -- <target>`
-  - If git commands unavailable: record as GAP
 
 ### **SECURITY: Shell Escaping for Bash Commands (Command Injection Defense)**
 **CRITICAL SECURITY RULE — Escape `<target>` in all bash commands:**

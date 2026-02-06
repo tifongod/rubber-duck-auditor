@@ -1,4 +1,4 @@
-# SKILL: rda-observability
+# SKILL: observability
 
 # Observability
 
@@ -11,7 +11,7 @@ You are a **MAANG Principal Backend Engineer** auditing production readiness of 
 ## Shared Rules (MANDATORY)
 
 Before doing anything else, read and follow:
-- `skills/_shared/rda-common-rules.md`
+- `skills/_shared/common-rules.md`
 - `skills/_shared/GUARDRAILS.md`
 - `skills/_shared/REPORT_TEMPLATE.md`
 - `skills/_shared/RISK_RUBRIC.md`
@@ -51,7 +51,6 @@ Then you MAY take the fast-path:
 - Update **only** the Run Metadata:
   - New timestamp (UTC)
   - Same commit hash (if unchanged)
-  - Change Detection: "No code changes detected via git diff/status"
 - Add note in Delta section: "Fast-path: no code changes detected since last run (commit XXXXX). Prior findings re-validated without deep re-inspection."
 - **EXCEPTION:** If prior report has **P0 items marked "not fixed"**, you MUST re-inspect those specific areas (no fast-path for P0s)
 
@@ -123,7 +122,7 @@ Use file locations from prior reports where possible. Within `TARGET_SERVICE_PAT
 
 **Rationale:** Dedicated tools provide better permission handling, are faster, and are auditable by the user.
 
-See `skills/_shared/rda-common-rules.md` lines 22-29 for full details.
+See `skills/_shared/common-rules.md` lines 22-29 for full details.
 
 ---
 
@@ -164,7 +163,6 @@ Write exactly ONE report:
 ## 0. Run Metadata
 - **Timestamp (UTC):** <YYYY-MM-DD HH:MM:SS UTC>
 - **Git Commit:** <hash or GAP>
-- **Change Detection:** <summary or GAP>
 
 ## 1. Context Recap
 - <2-5 bullets on observability components discovered>
