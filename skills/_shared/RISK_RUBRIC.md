@@ -125,7 +125,13 @@ Use these tags when applicable:
 
 - **DRIFT:** implementation/config contradicts `docs/rda/ARCHITECTURAL_DECISIONS.md`
 - **DECISION RISK:** ADR decision itself is risky; explain why and propose safer alternative
-- **GAP:** cannot be verified within scope boundary or missing artifacts (tests, docs, config, metrics)
+- **GAP:** cannot be verified within scope boundary or missing artifacts. Use when:
+    - Evidence would require reading files outside `<target>/`
+    - Required artifact doesn't exist (tests, docs, config, metrics, migration)
+    - Information exists only in runtime/logs/metrics, not in code
+    - External system behavior/policy is unknowable from service code alone
+    - Format: `GAP: <what is unknown> — <why it matters> — <what evidence is missing>`
+- **EXTERNAL DEP:** Reference to code/system outside `<target>/`. Record import path or endpoint; do NOT open external code.
 
 Tags should never replace evidence; they only clarify the nature of the risk.
 

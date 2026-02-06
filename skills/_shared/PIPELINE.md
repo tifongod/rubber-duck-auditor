@@ -7,7 +7,7 @@ Important:
 - Step folder names MUST NOT encode ordering (no numeric prefixes).
 - Ordering is defined ONLY here.
 - Each step writes exactly one report into: `<target>/docs/rda/reports/`
-- All steps must follow: `skills/_shared/AUDIT_RULES.md` and `skills/_shared/RISK_RUBRIC.md`
+- All steps must follow: `skills/_shared/rda-common-rules.md` and `skills/_shared/RISK_RUBRIC.md`
 
 ---
 

@@ -16,8 +16,16 @@ All step-specific prompts must **reference and follow** these rules.
 - If `<target>` is not provided, the agent must start from the **current working directory** (`.`) as `<target>`.
 
 ### No scope expansion
-- Do not “peek” into parent folders, sibling services, or repository-wide docs unless they are **inside `<target>`**.
+- Do not "peek" into parent folders, sibling services, or repository-wide docs unless they are **inside `<target>`**.
 - If something seems missing, call it out as a **gap** rather than expanding scope.
+
+### Tool usage for scope enforcement
+- ✅ DO: Use Glob with narrow patterns: `internal/*/`, `cmd/*/main.go`, `**/*.go` (specific extension)
+- ✅ DO: Use Grep with file type filters: `--type go`, `--glob "*.yaml"`
+- ✅ DO: Use Read tool directly for known file paths
+- ❌ DON'T: Use Bash `ls -R`, `find .`, or other recursive listing commands
+- ❌ DON'T: Use Glob `**/*` without extension filter (too broad, lists everything)
+- ❌ DON'T: Read files without verifying path starts with `<target>/`
 
 ---
 
@@ -83,16 +91,22 @@ The report must be written as an **iterative update**:
 
 ## 5) Evidence & Precision
 
-### Evidence-based claims
-- For any non-trivial claim, the agent should provide:
-    - file path(s)
-    - relevant symbol(s) or config key(s)
-    - short code references (avoid long copy/paste)
+### Evidence format (mandatory)
+- **File path:** Use format `<file>:<line-range>` (e.g., `internal/app/server.go:45-48`)
+- **Short excerpt:** ≤3 lines ONLY (never paste full functions or large blocks)
+- **NO markdown code blocks:** Do NOT use ` ``` ` blocks in report body (per report style constraint)
+- For long evidence: Use "see lines 45-68" instead of pasting code
+- Every non-trivial claim must include: file path + short excerpt OR line reference
+
+### Confidence levels (binary only)
+- **VERIFIED:** Direct evidence observed in files within `<target>/`
+- **GAP:** Cannot be determined within scope; mark what is missing (see RISK_RUBRIC.md)
+- ❌ Do NOT use "INFERRED" or "ASSUMED" — these are forms of speculation
 
 ### Avoid speculation
-- If something is unclear, say:
-    - **unknown**, **not found in scope**, or **needs confirmation**
-- List what evidence would confirm it.
+- If something is unclear: mark as **GAP** and continue
+- Do NOT ask clarifying questions — this is audit mode, not interactive mode
+- List what evidence would be needed to verify (for follow-up)
 
 ---
 
