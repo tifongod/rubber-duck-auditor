@@ -76,9 +76,9 @@ Every report MUST include "Delta vs previous run":
     - If file is missing/unreadable: record as **GAP** and proceed.
 
 ### Prior Reports Required (Context)
-2. **Inventory report (recommended):** `<target>/docs/rda/reports/01-service-inventory.md`
+2. **Inventory report (recommended):** `<target>/docs/rda/reports/00_service_inventory.md`
     - Use external dependencies list and infrastructure requirements.
-3. **Config report (recommended):** `<target>/docs/rda/reports/03-configuration-environment.md`
+3. **Config report (recommended):** `<target>/docs/rda/reports/02_configuration_environment.md`
     - Use configuration for external systems (endpoints, credentials, timeouts).
 
 If any report is missing: record as **GAP** and scan client/repository packages inside `TARGET_SERVICE_PATH`.
@@ -174,7 +174,7 @@ When findings relate to intentional decisions:
 
 Write exactly ONE report:
 
-**REPORT_PATH:** `<target>/docs/rda/reports/04-external-integrations.md`
+**REPORT_PATH:** `<target>/docs/rda/reports/03_external_integrations.md`
 
 ### Report Structure (in this exact order)
 

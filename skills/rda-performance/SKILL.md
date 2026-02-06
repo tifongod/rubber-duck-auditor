@@ -292,4 +292,4 @@ All assertions MUST be tied to evidence (file path + excerpt/line reference). If
 8) Practical load/perf validation plan included
 9) Action items are prioritized and verifiable
 10) Delta section present
-11) Report saved to `<target>/docs/rda/reports/performance.md`
+11) Report saved to `<target>/docs/rda/reports/09_performance_capacity.md`

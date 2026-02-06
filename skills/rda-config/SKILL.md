@@ -53,7 +53,6 @@ Every report MUST include a "Run Metadata" section with:
 - **Change Detection summary:**
     - Preferred: `git diff -- <target>` or `git status --porcelain -- <target>`
     - If git commands unavailable: record as GAP
-- **Inspected Files (Top Evidence):** List 10–30 file paths that were actually opened (if the service is small, list all key files opened)
 
 ### C) Mandatory Delta Section
 Every report MUST include "Delta vs previous run":
@@ -163,7 +162,6 @@ Write exactly ONE report:
 - **Timestamp (UTC):** <YYYY-MM-DD HH:MM:SS UTC>
 - **Git Commit:** <hash or GAP>
 - **Change Detection:** <summary or GAP>
-- **Inspected Files (Top Evidence):** <list 10-30 files>
 
 ## 1. Context Recap
 - <2-5 bullets on service config needs from inventory report>
@@ -247,7 +245,7 @@ All assertions MUST be tied to evidence (file path + excerpt/line reference). If
 ## Completion Criteria
 
 Before submitting:
-1. Run Metadata section is complete with timestamp and file list
+1. Run Metadata section is complete with timestamp
 2. All 10 checklist questions answered with evidence + assessment
 3. All env vars documented with required/optional status (or explicitly marked GAP)
 4. Secrets handling analyzed for exposure risks

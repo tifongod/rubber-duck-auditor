@@ -178,7 +178,7 @@ When findings relate to intentional decisions:
 
 Write exactly ONE report:
 
-- `REPORT_PATH = <target>/docs/rda/reports/security.md`
+- `REPORT_PATH = <target>/docs/rda/reports/08_security_privacy.md`
 
 Report must follow this structure and order:
 
@@ -323,4 +323,4 @@ All assertions MUST be tied to evidence (file path + excerpt/line reference). If
 8) Privacy assessment included
 9) Action items are prioritized and verifiable
 10) Delta section present
-11) Report saved to `<target>/docs/rda/reports/security.md`
+11) Report saved to `<target>/docs/rda/reports/08_security_privacy.md`
