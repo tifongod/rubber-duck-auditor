@@ -1,0 +1,13 @@
+{
+  "name": "rda",
+  "description": "RDA skills suite: production readiness audit skills for Claude Code",
+  "version": "0.1.0",
+  "author": {
+    "name": "Denis Kolpakov",
+    "email": "dkolp.com@gmail.com"
+  },
+  "homepage": "https://github.com/tifongod/rubber-duck-auditor",
+  "repository": "https://github.com/tifongod/rubber-duck-auditor",
+  "license": "MIT",
+  "keywords": []
+}
