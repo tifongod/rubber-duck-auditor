@@ -55,7 +55,6 @@ Every report MUST include a "Run Metadata" section with:
 - **Change Detection summary:**
     - Preferred: `git diff -- <target>` or `git status --porcelain -- <target>`
     - If git commands unavailable: record as GAP
-- **Inspected Files (Top Evidence):** List 10–30 file paths that were actually opened (if the service is small, list all key files opened)
 
 ### C) Mandatory Delta Section
 Every report MUST include "Delta vs previous run":
@@ -156,7 +155,7 @@ When findings relate to intentional decisions:
 
 Write exactly ONE report:
 
-**REPORT_PATH:** `<target>/docs/rda/reports/01-service-inventory.md`
+**REPORT_PATH:** `<target>/docs/rda/reports/00_service_inventory.md`
 
 ### Report Structure (in this exact order)
 
@@ -166,7 +165,6 @@ Write exactly ONE report:
 - **Timestamp (UTC):** <YYYY-MM-DD HH:MM:SS UTC>
 - **Git Commit:** <hash or GAP>
 - **Change Detection:** <summary or GAP>
-- **Inspected Files (Top Evidence):** <list 10-30 files>
 
 ## 1. Context Recap
 - <2-5 bullets summarizing service purpose and scope>

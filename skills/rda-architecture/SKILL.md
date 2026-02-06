@@ -53,7 +53,6 @@ Every report MUST include a "Run Metadata" section with:
 - **Change Detection summary:**
     - Preferred: `git diff -- <target>` or `git status --porcelain -- <target>`
     - If git commands unavailable: record as GAP
-- **Inspected Files (Top Evidence):** List 10–30 file paths that were actually opened (if the service is small, list all key files opened)
 
 ### C) Mandatory Delta Section
 Every report MUST include "Delta vs previous run":
@@ -77,7 +76,7 @@ Every report MUST include "Delta vs previous run":
     - If file is missing/unreadable: record as **GAP** and proceed.
 
 ### Prior Reports Required (Context)
-2. **Inventory report (recommended context):** `<target>/docs/rda/reports/01-service-inventory.md`
+2. **Inventory report (recommended context):** `<target>/docs/rda/reports/00_service_inventory.md`
     - Use file inventory, package structure, and entrypoints from this report.
     - If missing: record as **GAP** and perform minimal targeted scan of entrypoints and top-level packages only.
 
@@ -153,7 +152,7 @@ When findings relate to intentional decisions:
 
 Write exactly ONE report:
 
-**REPORT_PATH:** `<target>/docs/rda/reports/02-architecture-design.md`
+**REPORT_PATH:** `<target>/docs/rda/reports/01_architecture_design.md`
 
 ### Report Structure (in this exact order)
 
@@ -163,7 +162,6 @@ Write exactly ONE report:
 - **Timestamp (UTC):** <YYYY-MM-DD HH:MM:SS UTC>
 - **Git Commit:** <hash or GAP>
 - **Change Detection:** <summary or GAP>
-- **Inspected Files (Top Evidence):** <list 10-30 files>
 
 ## 1. Context Recap
 - <2-5 bullets on service architecture, referencing inventory report where relevant>

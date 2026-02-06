@@ -77,7 +77,7 @@ Every report MUST include "Delta vs previous run":
     - If file is missing/unreadable: record as **GAP** and proceed.
 
 ### Prior Reports Required (Context)
-2. **Inventory report (recommended context):** `<target>/docs/rda/reports/01-service-inventory.md`
+2. **Inventory report (recommended context):** `<target>/docs/rda/reports/00_service_inventory.md`
     - Use configuration surface and file inventory from this report.
     - If missing: record as **GAP** and scan likely config entrypoints and root `*.yaml`/`*.env*`/`*.json`/`*.toml` files.
 
@@ -153,7 +153,7 @@ When findings relate to intentional decisions:
 
 Write exactly ONE report:
 
-**REPORT_PATH:** `<target>/docs/rda/reports/03-configuration-environment.md`
+**REPORT_PATH:** `<target>/docs/rda/reports/02_configuration_environment.md`
 
 ### Report Structure (in this exact order)
 

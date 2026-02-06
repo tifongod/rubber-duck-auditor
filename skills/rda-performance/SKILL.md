@@ -57,7 +57,6 @@ Every report MUST include:
 - **Change Detection summary**
     - Preferred: `git diff -- <target>` or `git status --porcelain -- <target>`
     - If git commands unavailable: GAP
-- **Inspected Files (Top Evidence):** 10–30 file paths actually opened
 
 ### C) Mandatory Delta Section
 Every report MUST include "Delta vs previous run":
@@ -167,7 +166,7 @@ When findings relate to intentional decisions:
 
 Write exactly ONE report:
 
-- `REPORT_PATH = <target>/docs/rda/reports/performance.md`
+- `REPORT_PATH = <target>/docs/rda/reports/09_performance_capacity.md`
 
 Report must follow this structure and order:
 
@@ -177,7 +176,6 @@ Report must follow this structure and order:
 - Timestamp (UTC)
 - Git Commit (or GAP)
 - Change Detection (or GAP)
-- Inspected Files (Top Evidence) (10–30 paths)
 
 ## 1. Context Recap
 - 3–7 bullets: runtime model, primary flows, and why performance matters here

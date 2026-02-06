@@ -57,7 +57,6 @@ Every report MUST include:
 - **Change Detection summary**
     - Preferred: `git diff -- <target>` or `git status --porcelain -- <target>`
     - If git commands unavailable: GAP
-- **Inspected Files (Top Evidence):** 10–30 file paths actually opened
 
 ### C) Mandatory Delta Section
 Every report MUST include "Delta vs previous run":
@@ -189,7 +188,6 @@ Report must follow this structure and order:
 - Timestamp (UTC)
 - Git Commit (or GAP)
 - Change Detection (or GAP)
-- Inspected Files (Top Evidence) (10–30 paths)
 
 ## 1. Context Recap
 - 3–7 bullets: what the service does and why security matters here
