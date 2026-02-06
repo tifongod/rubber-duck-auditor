@@ -136,6 +136,9 @@ Rule: you may open the previous report file ONLY at the end to write this sectio
 
 ## Notes (author conventions)
 - Use explicit labels when applicable: **DRIFT**, **DECISION RISK**, **GAP**, **ASSUMPTION**.
-- Prefer “Evidence: <file:line-range>” over long prose.
+- **NEVER include "Inspected Files" or "Files Read" sections** in the report.
+  - These are verbose and low-signal.
+  - All evidence should be inline citations: "Evidence: file.go:12-14 — does X".
+- Prefer "Evidence: <file:line-range>" over long prose.
 - Keep it scannable: a reader should extract the key risks in <5 minutes.
 - Never open files outside <TARGET_SERVICE_PATH>; record them as **EXTERNAL DEP** only.

@@ -137,7 +137,7 @@ Complete this checklist with evidence:
 For each answer, provide:
 - **File path(s)** inspected
 - **Short excerpt** or line reference as evidence
-- **Confidence level:** VERIFIED / INFERRED / GAP
+- **Confidence level:** VERIFIED / GAP
 
 ---
 
@@ -242,7 +242,7 @@ Write exactly ONE report:
 ---
 
 ## No Speculation Rule
-All assertions MUST be tied to evidence (file path + excerpt/line reference). If evidence is unavailable, label as **INFERRED** or **GAP** and continue.
+All assertions MUST be tied to evidence (file path + excerpt/line reference). If evidence is unavailable, label as **GAP** and continue.
 
 ---
 

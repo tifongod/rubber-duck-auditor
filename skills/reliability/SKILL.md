@@ -267,7 +267,7 @@ Provide an evidence-based flow diagram of the critical path(s) (worker or API). 
 ---
 
 ## No Speculation Rule
-All assertions MUST be tied to evidence (file path + excerpt/line reference). If evidence is unavailable, label as **INFERRED** or **GAP** and continue.
+All assertions MUST be tied to evidence (file path + excerpt/line reference). If evidence is unavailable, label as **GAP** and continue.
 
 ---
 

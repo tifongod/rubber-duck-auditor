@@ -259,7 +259,7 @@ Write exactly ONE report:
 ---
 
 ## No Speculation Rule
-All assertions MUST be tied to evidence (file path + excerpt/line reference). If evidence is unavailable, label as **INFERRED** or **GAP** and continue.
+All assertions MUST be tied to evidence (file path + excerpt/line reference). If evidence is unavailable, label as **GAP** and continue.
 
 ---
 

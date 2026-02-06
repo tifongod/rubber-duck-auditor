@@ -93,19 +93,24 @@ The report must be written as an **iterative update**:
 
 ### Evidence format (mandatory)
 - **File path:** Use format `<file>:<line-range>` (e.g., `internal/app/server.go:45-48`)
-- **Short excerpt:** ≤3 lines ONLY (never paste full functions or large blocks)
-- **NO markdown code blocks:** Do NOT use ` ``` ` blocks in report body (per report style constraint)
+- **Short excerpt:** ≤3 lines ONLY, in **inline format** (never paste full functions or large blocks)
+- **NO markdown code blocks:** NEVER use ` ``` ` blocks in report body (per report style constraint)
+- **Correct format example:** "Evidence: config/loader.go:23-25 — validates required fields with `validator.Struct(cfg)` before use."
 - For long evidence: Use "see lines 45-68" instead of pasting code
 - Every non-trivial claim must include: file path + short excerpt OR line reference
+- **Inline code** (single backticks like `variableName`) is acceptable for identifiers
 
 ### Confidence levels (binary only)
 - **VERIFIED:** Direct evidence observed in files within `<target>/`
 - **GAP:** Cannot be determined within scope; mark what is missing (see RISK_RUBRIC.md)
-- ❌ Do NOT use "INFERRED" or "ASSUMED" — these are forms of speculation
+- ❌ Do NOT use "INFERRED", "ASSUMED", or "LIKELY" — these are forms of speculation
 
 ### Avoid speculation
 - If something is unclear: mark as **GAP** and continue
-- Do NOT ask clarifying questions — this is audit mode, not interactive mode
+- **NEVER ask clarifying questions** — this is audit mode, not interactive mode
+  - ❌ Wrong: "Should I use approach A or B?"
+  - ✅ Correct: "Approach A is standard for MAANG services. Marked approach choice as GAP pending ADR."
+- Best-effort delivery is preferred over asking questions
 - List what evidence would be needed to verify (for follow-up)
 
 ---

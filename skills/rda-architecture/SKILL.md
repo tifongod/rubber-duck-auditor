@@ -134,6 +134,7 @@ Complete this checklist with evidence:
 For each answer, provide:
 - **File path(s)** inspected
 - **Short excerpt** or line reference as evidence
+- **Confidence level:** VERIFIED / GAP
 - **Assessment:** GOOD / CONCERN / VIOLATION
 
 ---
@@ -185,7 +186,7 @@ Write exactly ONE report:
 
 ### 3.2 Layer Diagram (Actual, Evidence-Based)
 - Show an ASCII diagram of the real dependency flow (based on inspected imports).
-- If uncertain, mark uncertain edges as **INFERRED** and explain why.
+- If uncertain, mark uncertain edges as **GAP** and explain why (e.g., "GAP: cannot trace X→Y without opening external lib").
 
 Example format:
 cmd/
@@ -241,7 +242,7 @@ cmd/
 ---
 
 ## No Speculation Rule
-All assertions MUST be tied to evidence (file path + excerpt/line reference). If evidence is unavailable, label as **INFERRED** or **GAP** and continue.
+All assertions MUST be tied to evidence (file path + excerpt/line reference). If evidence is unavailable, label as **GAP** and continue.
 
 ---
 
