@@ -6,6 +6,7 @@ This skill is reports-only: you MUST NOT inspect source code, configs, manifests
 
 References (shared standards):
 - skills/_shared/common-rules.md
+- skills/_shared/GUARDRAILS.md
 - skills/_shared/RISK_RUBRIC.md
 - skills/_shared/PIPELINE.md
 
@@ -18,7 +19,7 @@ References (shared standards):
 
 Derived paths:
 - REPORTS_DIR = "<TARGET>/docs/rda/reports"
-- OUTPUT_PATH = "<TARGET>/docs/rda/reports/SUMMARY.md"
+- OUTPUT_PATH = "<TARGET>/docs/rda/summary/00_summary.md"
 
 ---
 

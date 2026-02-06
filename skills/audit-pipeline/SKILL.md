@@ -222,11 +222,11 @@ The following steps MUST be executed in wave order (see Dependency Waves above).
 
 9. Step 08 — Security & Privacy
     - Skill: `security`
-    - Output: `<target>/docs/rda/reports/08_security_and_privacy.md`
+    - Output: `<target>/docs/rda/reports/08_security_privacy.md`
 
 10. Step 09 — Performance & Capacity
     - Skill: `performance`
-    - Output: `<target>/docs/rda/reports/09_performance_and_capacity.md`
+    - Output: `<target>/docs/rda/reports/09_performance_capacity.md`
 
 **Wave 7:**
 11. Executive Summary
