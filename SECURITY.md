@@ -78,7 +78,7 @@ For highly sensitive reports, use PGP key (coming soon — check this file for u
 - **Acknowledgment:** We will confirm receipt and assess severity within 72 hours.
 - **Verification:** We may ask for clarifications or additional proof of concept.
 - **Credit:** If you wish, we will credit you in release notes and CHANGELOG.md (unless you prefer to remain anonymous).
-- **Fix publication:** Security fixes will be released as patch versions (e.g., 0.1.7) with clear CHANGELOG entries.
+- **Fix publication:** Security fixes will be released as patch versions (e.g., 0.1.8) with clear CHANGELOG entries.
 - **No bounty program:** This is an open-source plugin with no commercial backing. We appreciate responsible disclosure but cannot offer monetary rewards.
 
 ---
@@ -102,8 +102,8 @@ For highly sensitive reports, use PGP key (coming soon — check this file for u
 ### Release Process
 1. **Update version** in `.claude-plugin/plugin.json` and `skills/*/SKILL.md` headers
 2. **Update CHANGELOG.md** with all changes (Added / Changed / Fixed / Security)
-3. **Create signed tag:** `git tag -s v0.1.7 -m "Release v0.1.7: Security fixes"`
-4. **Push tag:** `git push origin v0.1.7`
+3. **Create signed tag:** `git tag -s v0.1.8 -m "Release v0.1.8: Security fixes"`
+4. **Push tag:** `git push origin v0.1.8`
 5. **Create GitHub release** with release notes (copy from CHANGELOG.md)
 
 ### Dependency Hygiene
@@ -156,4 +156,4 @@ If you suspect a security issue or observe unexpected behavior:
 
 **Last Updated:** 2026-02-06
 **Maintainer Contact:** dkolp.com@gmail.com
-**Plugin Version:** 0.1.7
+**Plugin Version:** 0.1.8

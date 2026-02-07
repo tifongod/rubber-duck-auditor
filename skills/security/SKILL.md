@@ -4,7 +4,9 @@
 
 ## Role & Objective
 
-You are a **MAANG Principal Backend Engineer** auditing production readiness of a single service. Your task in this step is to evaluate **security and privacy posture** of the service: attack surface, authn/authz, secrets handling, crypto/TLS, dependency & supply-chain risks, least-privilege for external systems, input validation, and sensitive-data hygiene.
+You are a **MAANG Principal Backend Engineer** auditing production readiness of a single service. Your task in this step is to evaluate the **security and privacy posture** of the service in a technology-agnostic way: attack surface, authn/authz, secrets handling, crypto/TLS, dependency & supply-chain risks, least-privilege for external systems, input validation, and sensitive-data hygiene.
+
+**Do not assume** any specific platform (cloud/vendor), datastore, queue, or deployment model. If a technology matters, you must first **detect it within scope** and then evaluate it.
 
 The output must be practical: concrete risks, evidence, and a prioritized remediation plan.
 
@@ -36,7 +38,7 @@ If you need to re-run this step, wait for the current execution to complete befo
 ## Inputs
 
 - `<target>` (optional): service root directory. If not provided, use `.`.
-    - Recommended example: `<target> = services/some-service`
+  - Recommended example: `<target> = services/some-service`
 
 ### Mandatory Context (Read FIRST)
 1) `ARCH_DECISIONS_PATH = <target>/docs/rda/ARCHITECTURAL_DECISIONS.md`
@@ -47,9 +49,9 @@ If you need to re-run this step, wait for the current execution to complete befo
 ### Prior Reports (Read SECOND)
 2) Read ALL existing reports in `<target>/docs/rda/reports/` (if present).
 - Use them to:
-    - identify previously known critical paths (what to secure first)
-    - re-check previously reported P0/P1 items
-    - avoid duplicates and keep the plan coherent
+  - identify previously known critical paths (what to secure first)
+  - re-check previously reported P0/P1 items
+  - avoid duplicates and keep the plan coherent
 - Do NOT treat them as absolute truth: verify against code in this run.
 
 If the reports directory is missing/empty: record as **GAP** and proceed.
@@ -57,8 +59,8 @@ If the reports directory is missing/empty: record as **GAP** and proceed.
 ### Fast-Path for Unchanged Target
 
 If **both** of the following are true:
-1. `git diff -- "${target}"` returns empty (no uncommitted changes)
-2. `git status --porcelain -- "${target}"` returns empty (no untracked files)
+1. `git diff -- <target>` returns empty (no uncommitted changes)
+2. `git status --porcelain -- <target>` returns empty (no untracked files)
 
 Then you MAY take the fast-path:
 - Read the previous report for this step (if exists)
@@ -75,16 +77,30 @@ If the prior report does NOT exist, or has P0s, or you are uncertain: skip fast-
 
 ---
 
+## Pattern Discovery (MANDATORY)
+
+Before deep inspection, quickly identify which security surfaces apply to this service and keep evidence (paths + short excerpts):
+- Runtime model: API server / worker / cron / CLI / mixed
+- Entry points and exposed surfaces: HTTP/gRPC, message consumption, admin/debug/metrics endpoints
+- Authn/authz presence: middleware/interceptors, identity tokens/keys, service-to-service auth
+- External dependencies: datastores, caches, queues/brokers, object storage, external HTTP/gRPC
+- Secrets/config sources: env/config files/secret managers (as visible), and any redaction/logging patterns
+- Sensitive data classes: tokens/credentials, PII, customer data, internal identifiers
+
+If something is ABSENT (e.g., no auth layer, no inbound server, no queue usage), explicitly state "Not detected" with discovery evidence later.
+
+---
+
 ## What to Inspect (SECURITY-SCOPED)
 
 Within `TARGET_SERVICE_PATH` ONLY.
 
 ### 1) Attack Surface & Trust Boundaries
-- Entrypoints: HTTP/gRPC servers, workers, CLIs, admin/private endpoints, health/debug endpoints.
+- Entrypoints: HTTP/gRPC servers, workers, CLIs, admin/private endpoints, health/debug/metrics endpoints.
 - Network listeners and exposed ports (where visible in code/config).
 - Trust boundaries: what is considered trusted input vs untrusted input (requests, queue messages, configs).
 
-### 2) AuthN / AuthZ
+### 2) AuthN / AuthZ (If Applicable)
 - Authentication mechanisms (JWT/API keys/mTLS/service identity).
 - Authorization checks: where enforced, how consistently applied, default-deny posture.
 - Internal/admin endpoints protection (especially health, metrics, debug).
@@ -92,8 +108,8 @@ Within `TARGET_SERVICE_PATH` ONLY.
 ### 3) Input Validation & Injection Risks
 - Request parsing and validation (HTTP/gRPC).
 - Any query building / DSL parsing (risk of injection or sandbox escape).
-- Risks: SQL/ClickHouse injection, SSRF, path traversal, template injection, regex DoS, unsafe deserialization.
-- For queue consumers: validation of message schema/version and strict handling of unexpected fields.
+- Risks (evaluate only if applicable/detected): datastore query injection (SQL/NoSQL/DSL), SSRF, path traversal, command execution, template injection, regex DoS, unsafe deserialization.
+- For consumers: validation of message schema/version and strict handling of unexpected fields.
 
 ### 4) Secrets & Sensitive Config
 - Secrets sources: env vars, files, config, embedded constants.
@@ -101,21 +117,21 @@ Within `TARGET_SERVICE_PATH` ONLY.
 - Redaction policy: ensure secrets are not logged/returned in errors.
 
 ### 5) Crypto & Transport Security
-- TLS usage for external calls (AWS, DB, ClickHouse, other HTTP/gRPC).
+- TLS usage for external calls (cloud SDKs, datastores, external HTTP/gRPC).
 - TLS verification settings (no insecure skip verify, no plaintext fallback).
 - Any encryption/hashing usage: correct primitives, no custom crypto, key management strategy.
 - At-rest encryption assumptions (if referenced in configs/docs): verify what’s visible in code/config; otherwise GAP.
 
 ### 6) External Systems Least-Privilege (As Visible From This Repo Slice)
-- AWS IAM usage patterns (role-based auth vs static keys).
-- Permissions scoping (queue/table names, prefixes, actions).
+- Cloud IAM usage patterns (role-based auth vs static keys), scoped permissions as visible in code/config.
+- Permissions scoping (resource names, prefixes, actions) where visible.
 - Database credentials and privilege scope (read/write separation, least privilege).
 - If IAM policies/manifests are outside boundary: record GAP and describe what must be verified outside.
 
 ### 7) Dependency & Supply-Chain Hygiene
 - `go.mod` / dependency choices: risky libs, abandoned libs, excessive transitive surface.
 - Use of `replace` directives, private forks, unpinned versions.
-- Build tooling signals within scope (if present): SAST/secrets scan config, govulncheck, dependency scanning.
+- Build/tooling signals within scope (if present): SAST/secrets scan config, govulncheck, dependency scanning.
 - If CI is defined only outside boundary: record GAP and list what checks should exist.
 
 ### 8) Privacy & Data Protection
@@ -129,9 +145,8 @@ Within `TARGET_SERVICE_PATH` ONLY.
 ## Tool Usage (MANDATORY)
 
 **DO use these tools:**
-- ✅ **Glob** for file patterns: `**/*.go`, `internal/*/`, `cmd/*/main.go`, `**/*.{yaml,yml}`
+- ✅ **Glob** for file patterns: `**/*.go`, `internal/*/`, `cmd/*/main.go`, `**/*.{yaml,yml,json,sql,md}`
 - ✅ **Grep** for content search:
-  - `pattern="timeout"`, `--type go`, `--glob "*.yaml"`
   - Use `output_mode="files_with_matches"` for listing, `output_mode="content"` for excerpts
 - ✅ **Read** for known file paths (always prefer Read over cat/head/tail)
 
@@ -151,22 +166,27 @@ See `skills/_shared/common-rules.md` lines 22-29 for full details.
 Answer each checklist question with:
 - **File path(s) inspected**
 - **Short excerpt** or **line reference** as evidence
-- **Assessment:** GOOD / CONCERN / RISK / GAP
+- **Assessment:** GOOD / CONCERN / RISK / GAP / N/A
+
+When you write *Risks* and *Action Items*, you MUST follow `skills/_shared/RISK_RUBRIC.md`:
+- Risks must include all required fields (Category, Severity S0–S3, Priority P0–P2, Impact, Likelihood L1–L3, Blast Radius B1–B3, Detection D1–D3, Evidence, Recommendation, Verification).
+- If any required field cannot be supported within scope: mark it as **GAP** (do not speculate).
+- Action items must be specific, bounded, and verifiable (include “Verify”).
 
 Checklist:
 
 | # | Question | How to Verify |
 |---|----------|---------------|
 | 1 | What are the service entrypoints and exposed surfaces? | Locate `cmd/` mains and server init; list endpoints/servers |
-| 2 | What trust boundaries exist? | Identify sources of untrusted input (HTTP/gRPC, SQS, env/config) |
+| 2 | What trust boundaries exist? | Identify sources of untrusted input (HTTP/gRPC, consumer messages, env/config) |
 | 3 | How is authentication implemented (if applicable)? | Inspect middleware/interceptors; config requirements |
 | 4 | How is authorization enforced (if applicable)? | Trace request handling to authz checks; check default-deny |
-| 5 | Are inputs validated and safely handled? | Look for validation, schema checks, safe parsing; injection risks |
-| 6 | How are secrets handled and protected from leakage? | Find config loading, env vars, logging redaction |
+| 5 | Are inputs validated and safely handled? | Look for validation/schema checks/safe parsing; injection risks |
+| 6 | How are secrets handled and protected from leakage? | Find config loading, env vars, logging/redaction, error surfaces |
 | 7 | Is transport security correctly configured? | Check TLS settings for external clients and servers |
-| 8 | Are external privileges least-privilege (as visible)? | Inspect AWS client init, resource naming, DB user usage |
+| 8 | Are external privileges least-privilege (as visible)? | Inspect client init, resource naming, DB user usage; note GAPs |
 | 9 | Is dependency hygiene acceptable? | Review `go.mod`, replace directives, scanning hooks (if any) |
-| 10 | Is privacy/sensitive data handled safely? | Inspect models/events/logging; check PII exposure and retention |
+| 10 | Is privacy/sensitive data handled safely? | Inspect models/events/logging; check PII/token exposure and retention |
 
 ---
 
@@ -194,23 +214,30 @@ Report must follow this structure and order:
 - List recorded EXTERNAL DEPs (record-only)
 - List notable GAPs caused by boundary (e.g., IAM policies/infra outside scope)
 
-## 3. Evidence
+## 3. Pattern Discovery Summary
+| Surface | Status (PRESENT/ABSENT/GAP) | Evidence (paths + brief note) |
+|---------|------------------------------|-------------------------------|
+| Inbound servers (HTTP/gRPC) | ... | ... |
+| Consumers/workers | ... | ... |
+| AuthN/AuthZ | ... | ... |
+| Datastores/caches | ... | ... |
+| External HTTP/gRPC calls | ... | ... |
+| Secrets/config patterns | ... | ... |
+| Sensitive data classes | ... | ... |
 
-### 3.1 Attack Surface Inventory
+## 4. Evidence
+
+### 4.1 Attack Surface Inventory
 | Surface | Location | Exposure | Notes | Assessment |
 |---------|----------|----------|-------|------------|
-| HTTP/gRPC server | ... | public/private | ... | ... |
-| Health/metrics/debug | ... | ... | ... | ... |
-| Worker/consumer | ... | internal | ... | ... |
+| ... | ... | public/private/internal | ... | ... |
 
-### 3.2 Trust Boundaries Snapshot
+### 4.2 Trust Boundaries Snapshot
 | Input Source | Trusted? | Validation Present? | Evidence | Risk |
 |--------------|----------|---------------------|----------|------|
-| HTTP/gRPC requests | ... | ... | ... | ... |
-| Queue messages | ... | ... | ... | ... |
-| Env/config | ... | ... | ... | ... |
+| ... | ... | ... | ... | ... |
 
-### 3.3 AuthN/AuthZ (If Applicable)
+### 4.3 AuthN/AuthZ (If Applicable)
 | Control | Where Implemented | Coverage | Evidence | Assessment |
 |---------|--------------------|----------|----------|------------|
 | Authentication | ... | ... | ... | ... |
@@ -219,76 +246,69 @@ Report must follow this structure and order:
 
 If auth is out-of-scope for this service: state explicitly and justify with evidence.
 
-### 3.4 Input Validation & Injection Review
+### 4.4 Input Validation & Injection Review
 | Vector | Location | Current Handling | Evidence | Assessment | Recommendation |
 |--------|----------|------------------|----------|------------|----------------|
-| ClickHouse/SQL injection | ... | ... | ... | ... | ... |
+| Datastore query injection (store-specific) | ... | ... | ... | ... | ... |
 | SSRF | ... | ... | ... | ... | ... |
 | Path traversal | ... | ... | ... | ... | ... |
 | Regex DoS / parsing | ... | ... | ... | ... | ... |
 | Unsafe deserialization | ... | ... | ... | ... | ... |
 
-### 3.5 Secrets & Sensitive Config
+### 4.5 Secrets & Sensitive Config
 | Secret / Sensitive Value | Source | Handling | Leakage Risk | Evidence | Assessment |
 |--------------------------|--------|----------|--------------|----------|------------|
 | ... | env/config/file | ... | ... | ... | ... |
 
 Include explicit check for: hardcoded secrets, test fixtures, sample configs, logs/errors exposure.
 
-### 3.6 Crypto & Transport Security
-| Channel | TLS Enabled? | Verification | Cipher/Settings (if visible) | Evidence | Assessment |
-|---------|--------------|--------------|------------------------------|----------|------------|
+### 4.6 Crypto & Transport Security
+| Channel | TLS Enabled? | Verification | Settings (if visible) | Evidence | Assessment |
+|---------|--------------|--------------|------------------------|----------|------------|
 | External clients | ... | ... | ... | ... | ... |
 | Inbound server | ... | ... | ... | ... | ... |
 
-### 3.7 Least-Privilege & External Access (Visible Scope Only)
+### 4.7 Least-Privilege & External Access (Visible Scope Only)
 | System | Auth Mechanism | Scope/Permissions (visible) | Evidence | Assessment | GAPs |
 |--------|----------------|-----------------------------|----------|------------|------|
-| AWS (SQS/Dynamo/etc) | ... | ... | ... | ... | ... |
-| DB/ClickHouse | ... | ... | ... | ... | ... |
+| Cloud SDKs / queues / storage | ... | ... | ... | ... | ... |
+| Datastores | ... | ... | ... | ... | ... |
 
 If policies/manifests are outside scope: record as GAP and list required verification questions.
 
-### 3.8 Dependency & Supply-Chain Hygiene
+### 4.8 Dependency & Supply-Chain Hygiene
 | Item | Evidence | Assessment | Risk | Recommendation |
 |------|----------|------------|------|----------------|
 | go.mod hygiene | ... | ... | ... | ... |
 | replace directives | ... | ... | ... | ... |
 | vuln scanning hooks (if any) | ... | ... | ... | ... |
 
-### 3.9 Privacy & Sensitive Data Handling
+### 4.9 Privacy & Sensitive Data Handling
 | Data Type | Where Appears | Stored? | Logged? | Retention Visible? | Evidence | Assessment |
 |----------|---------------|---------|--------|--------------------|----------|------------|
 | PII/tokens/credentials | ... | ... | ... | ... | ... | ... |
 
 If no PII: justify with evidence; otherwise evaluate minimization and leakage risk.
 
-## 4. Findings
+## 5. Findings
 
-### 4.1 Strengths
+### 5.1 Strengths
 - Bullets with evidence references
 
-### 4.2 Risks
-- Bullets with evidence, severity, impact
-- Prefer concrete exploit/failure scenarios (high-level, no “how-to exploit” instructions)
+### 5.2 Risks
+All risks MUST be written using `skills/_shared/RISK_RUBRIC.md` required fields.  
+Avoid “how-to exploit” instructions; describe risks at a high level with evidence and concrete mitigations.
 
-### 4.3 Gaps
+### 5.3 Gaps
 - Items not verifiable within boundary, with what must be checked elsewhere
 
-## 5. Action Items
-
-### P0 (Critical)
-- Item | Impact | Evidence | Verification (how to prove fixed)
-
-### P1 (Important)
-- Item | Impact | Evidence | Verification
-
-### P2 (Nice-to-have)
-- Item | Impact | Evidence | Verification
+## 6. Action Items
+Use the one-line format from `skills/_shared/RISK_RUBRIC.md`:
+`<Action>` | **Priority:** P0/P1/P2 | **Impact:** ... | **Verify:** ...
 
 Keep action items specific and testable.
 
-## 6. Delta vs Previous Run
+## 7. Delta vs Previous Run
 - If prior report existed: 3–10 bullets on differences
 - If first run: "First run — no prior report to compare"
 - If no material changes: "No material changes detected" + 3–5 re-checked items
@@ -304,6 +324,6 @@ Keep action items specific and testable.
 6) Least-privilege assessed (or GAP with concrete follow-ups)
 7) Dependency hygiene assessed (or GAP with concrete follow-ups)
 8) Privacy assessment included
-9) Action items are prioritized and verifiable
+9) Risks and action items comply with `skills/_shared/RISK_RUBRIC.md`
 10) Delta section present
 11) Report saved to `<target>/docs/rda/reports/08_security_privacy.md`

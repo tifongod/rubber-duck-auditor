@@ -184,4 +184,4 @@ If none of these solutions resolve your issue:
 
 ---
 
-<sub>Rubber Duck Auditor v0.1.7 | [GitHub](https://github.com/tifongod/rubber-duck-auditor)</sub>
+<sub>Rubber Duck Auditor v0.1.8 | [GitHub](https://github.com/tifongod/rubber-duck-auditor)</sub>

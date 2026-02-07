@@ -1,7 +1,7 @@
 {
   "name": "rda",
   "description": "RDA skills suite: production readiness audit skills for Claude Code",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": {
     "name": "Denis Kolpakov",
     "email": "dkolp.com@gmail.com"

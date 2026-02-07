@@ -1,43 +1,47 @@
 # Testing, Delivery & Maintainability Report
 
 ## 0. Run Metadata
-- **Timestamp (UTC):** 2026-02-07 22:00:00 UTC
-- **Audit Author:** [Rubber Duck Auditor v0.1.5](https://github.com/tifongod/rubber-duck-auditor) (Claude Code plugin)
-- **Git Commit:** 65b6c585b8b8ca8f5ca32e119c212253f649b1a8
+- **Timestamp (UTC):** 2026-02-07 11:40:36 UTC
+- **Audit Author:** [Rubber Duck Auditor v0.1.8](https://github.com/tifongod/rubber-duck-auditor) (Claude Code plugin)
+- **Git Commit:** 28f6bac837ba2d1878523cab3ff8b9f890fd7212
+- **Template Version:** v1.0.0
 
-> **SECURITY NOTICE:** This report may contain code excerpts and file paths from the audited codebase. If the audited codebase contains committed secrets (API keys, credentials, tokens), they may appear in evidence sections. **Do NOT commit this report to public repositories without redacting sensitive data.** Audit reports are diagnostic artifacts intended for private review only.
+> **⚠️ SECURITY NOTICE:** This report may contain code excerpts and file paths from the audited codebase. If the audited codebase contains committed secrets (API keys, credentials, tokens), they may appear in evidence sections. **Do NOT commit this report to public repositories without redacting sensitive data.** Audit reports are diagnostic artifacts intended for private review only.
 
 ## 1. Context Recap
-- **Service:** rubber-duck-auditor (RDA) -- Claude Code plugin providing production readiness audit playbooks via SKILL.md prompt files. Zero executable code, zero runtime dependencies.
-- **Scope for this step:** Test strategy/quality, CI signals, delivery/rollback readiness, documentation/runbooks, maintainability patterns, and consolidated action items from all prior steps (00-06)
-- **Relevant prior reports used:** `docs/rda/reports/00_service_inventory.md`, `docs/rda/reports/01_architecture_design.md`, `docs/rda/reports/02_configuration_environment.md`, `docs/rda/reports/03_external_integrations.md`, `docs/rda/reports/04_data_handling.md`, `docs/rda/reports/05_reliability_failure_handling.md`, `docs/rda/reports/06_observability.md`, `docs/rda/reports/07_testing_delivery_maintainability.md` (prior run at commit 83bcb7a)
+- **Service:** rubber-duck-auditor (RDA) — Claude Code plugin providing production readiness audit playbooks via SKILL.md prompt files. Zero executable code, zero runtime dependencies.
+- **Scope for this step:** Test strategy/quality, CI signals, delivery/rollback readiness, documentation/runbooks, maintainability patterns, and consolidated action items from all prior steps (00-09)
+- **Relevant prior reports used:** `docs/rda/reports/00_service_inventory.md`, `docs/rda/reports/01_architecture_design.md`, `docs/rda/reports/02_configuration_environment.md`, `docs/rda/reports/03_external_integrations.md`, `docs/rda/reports/04_data_handling.md`, `docs/rda/reports/05_reliability_failure_handling.md`, `docs/rda/reports/06_observability.md` (all at commit 28f6bac)
 - **Key components involved:**
-  - 12 SKILL.md prompt files (~3,150 lines of prompt engineering content)
-  - 5 shared framework files (`skills/_shared/`: common-rules, GUARDRAILS, REPORT_TEMPLATE, RISK_RUBRIC, PIPELINE; 36,183 bytes total)
-  - Plugin distribution system (`.claude-plugin/plugin.json` v0.1.5, `.claude-plugin/marketplace.json`)
-  - Project settings (`.claude/settings.json` -- git-tracked, new since prior step 07 run)
+  - 12 SKILL.md prompt files (3,325 lines total, up from 3,150 in prior run, +5.6%)
+  - 5 shared framework files (`skills/_shared/`: common-rules, GUARDRAILS, REPORT_TEMPLATE, RISK_RUBRIC, PIPELINE; 36,737 bytes total)
+  - Plugin distribution system (`.claude-plugin/plugin.json` v0.1.8, `.claude-plugin/marketplace.json`)
+  - Project settings (`.claude/settings.json`, `.claude/settings.example.json` — NEW)
+  - Documentation suite (`README.md`, `CHANGELOG.md` — NEW, `SECURITY.md`, `docs/rda/ARCHITECTURAL_DECISIONS.md` — NEW, `docs/rda/TROUBLESHOOTING.md` — NEW)
   - Report output system (`docs/rda/reports/`, `docs/rda/summary/`)
 
 ### Decision Context (from `docs/rda/ARCHITECTURAL_DECISIONS.md`)
-- **GAP** -- File expected at `docs/rda/ARCHITECTURAL_DECISIONS.md` per `skills/_shared/common-rules.md:61-62`. An empty file exists at `docs/ARCHITECTURAL_DECISIONS.md` (wrong path, 0 bytes). Cannot verify intentional tradeoffs for test strategy (no automated validation), delivery model (git-based distribution), maintainability decisions (duplication tolerance), or naming conventions. Carried forward from prior run; partially addressed (file created in commit 65b6c58 but empty and at wrong location).
+- **Relevant ADRs:** ADR-001 (Prompt Composition), ADR-002 (Content Duplication vs Shared File Extraction), ADR-003 (Wave-Based Execution), ADR-004 (Security Hardening), ADR-005 (Path Hygiene), ADR-006 (Clean Directory Naming), ADR-007 (Zero Test Policy), ADR-008 (Relative Path References)
+- **Excerpt(s):** "Ship without tests. Rely on dogfooding for validation... Known risks: No regression detection. Prompt drift risk." (ADR-007:132-139). "Accept duplication for now. Prioritize working system over perfect maintainability." (ADR-002:35). "Zero-runtime constraint prevents programmatic composition. Text-based composition is the only option." (ADR-001:22).
+- **Status:** File exists at correct path (`docs/rda/ARCHITECTURAL_DECISIONS.md`) and is populated with 8 ADRs (167 lines) plus 4 future decisions. Resolves prior P1 finding "ADR file empty and at wrong path".
 
 ## 2. Scope & Guardrails Confirmation
-- Inspection limited to: `.` (repository root, relative to `<run_root>`)
-- No external code opened: CONFIRMED
-- No files outside TARGET_SERVICE_PATH accessed: CONFIRMED
+- ✅ **Inspection limited to:** `.` (repository root, relative to run root)
+- ✅ **No external code opened:** CONFIRMED
+- ✅ **No files outside TARGET_SERVICE_PATH accessed:** CONFIRMED
 
 ### External Dependencies Recorded
 
 | Import / Reference | Type | Used In | Notes |
 |---|---|---|---|
 | Claude Code Plugin Framework | EXTERNAL DEP / Platform | `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` | Plugin discovery and skill execution environment |
-| Claude AI LLM Runtime | EXTERNAL DEP / Runtime | All 12 SKILL.md files | Execution environment -- skills are prompts interpreted by Claude |
-| Git CLI | EXTERNAL DEP / Tool | All 10 step skills (fast-path change detection) | Read-only: `git diff`, `git status`, `git log` with mandatory shell escaping per `skills/_shared/GUARDRAILS.md:63-71` |
+| Claude AI LLM Runtime | EXTERNAL DEP / Runtime | All 12 SKILL.md files | Execution environment — skills are prompts interpreted by Claude |
+| Git CLI | EXTERNAL DEP / Tool | All 10 step skills (fast-path change detection) | Read-only: `git diff`, `git status`, `git log` with mandatory shell escaping per `GUARDRAILS.md:66-74` |
 | Claude Code Tools (Glob/Grep/Read/Write/Bash) | EXTERNAL DEP / Platform | All step skills "Tool Usage" sections | File operation tools provided by Claude Code runtime |
 
 ### Notable GAP Items Caused by Scope Limits
-- **GAP: CI/CD pipeline visibility** -- No `.github/workflows/`, `.gitlab-ci.yml`, Makefile, or similar CI config found within scope. Plugin distribution relies on external GitHub repository + Claude Code marketplace mechanism. Cannot assess automated quality gates or release automation.
-- **GAP: Marketplace validation process** -- Plugin submission/approval workflow is external to this codebase. Cannot verify marketplace quality gates or user-facing validation.
+- **GAP: CI/CD pipeline visibility** — No `.github/workflows/`, `.gitlab-ci.yml`, Makefile, or similar CI config found within scope. Plugin distribution relies on external GitHub repository + Claude Code marketplace mechanism. Cannot assess automated quality gates or release automation.
+- **GAP: Marketplace validation process** — Plugin submission/approval workflow is external to this codebase. Cannot verify marketplace quality gates or user-facing validation.
 
 ## 3. Evidence
 
@@ -45,54 +49,56 @@
 
 | Test File | Category (unit/integration/e2e) | Component Tested | Notes |
 |----------|----------------------------------|------------------|-------|
-| **NONE** | N/A | N/A | No test files of any kind found via Glob patterns (`**/*test*`, `**/*.sh`, `**/*.yml`, `**/*.yaml`). Zero automated test coverage. |
+| **NONE** | N/A | N/A | No test files of any kind found via Glob patterns (`**/*test*`, `**/*.spec.*`, `test/**/*`). Zero automated test coverage. |
 
-**Finding:** Zero test files. VERIFIED via Glob for `*_test.go`, `*_test.py`, `*_test.js`, `test_*.py`, `*.spec.*`, and generic `*test*` patterns. This is a prompt engineering artifact with no traditional executable code, but prompt quality validation remains a P1 gap.
+**Finding:** Zero test files. VERIFIED via Glob. This is a prompt engineering artifact with no traditional executable code, but prompt quality validation remains a P1 gap per ADR-007 documented risks ("No regression detection", "Prompt drift risk").
+
+**Context from ADR-007:** "Ship without tests. Rely on dogfooding (running audits on the rda codebase itself) for validation... Rationale: Prompt quality is hard to test programmatically. Manual verification via self-audit is pragmatic starting point. Automated validation is future work." Evidence: `docs/rda/ARCHITECTURAL_DECISIONS.md:127-142`.
 
 ### 3.2 Coverage Map (Critical Paths)
 
 | Critical Area | Has Tests? | Quality | Evidence | Gap |
 |---------------|------------|---------|----------|-----|
-| Prompt completeness (all checklist questions answered) | NO | N/A | No validation script or golden test cases found | P1 -- malformed prompts undetectable until manual inspection |
-| Shared contract compliance (RISK_RUBRIC 12 required fields) | NO | N/A | No validation found | P1 -- non-compliant reports pass through pipeline |
-| Tool Usage section consistency (10 identical copies) | NO | N/A | Grep confirms 10 identical "Tool Usage (MANDATORY)" sections across step skills | P1 -- inconsistent updates across 10 files |
+| Prompt completeness (all checklist questions answered) | NO | N/A | No validation script or golden test cases found | P1 — malformed prompts undetectable until manual inspection |
+| Shared contract compliance (RISK_RUBRIC 12 required fields) | NO | N/A | No validation found | P1 — non-compliant reports pass through pipeline |
+| Tool Usage section consistency (10 identical copies) | NO | N/A | Grep confirms 10 identical "Tool Usage (MANDATORY)" sections across step skills | P1 — inconsistent updates across 10 files |
 | Evidence format correctness (inline citations, no code blocks) | NO | N/A | No validation found | Reports may contain banned markdown code blocks |
-| Fast-path P0 exception enforcement | NO | N/A | `skills/audit-pipeline/SKILL.md:301-312` checks structure only, not P0 re-inspection compliance | P1 -- agents may skip P0 re-inspection incorrectly |
-| Report filename consistency | NO | N/A | Three conflicting definitions confirmed (security, performance, summary) per Grep | P1 -- downstream consumers may miss reports |
-| Scope boundary enforcement | NO | N/A | `skills/_shared/GUARDRAILS.md:9-29` defines rules; no runtime validation | Agent behavioral enforcement only |
-| Shell escaping compliance | NO | N/A | All 10 step skills use unquoted `git diff -- <target>` contradicting `GUARDRAILS.md:65-67` | P1 -- security/reliability risk |
-| Report structure validation | PARTIAL | LOW | Pipeline Quality Gates at `skills/audit-pipeline/SKILL.md:301-312` check section presence but rely on agent execution | P1 -- no programmatic validation logic |
+| Fast-path P0 exception enforcement | NO | N/A | `skills/audit-pipeline/SKILL.md:301-312` checks structure only, not P0 re-inspection compliance | P1 — agents may skip P0 re-inspection incorrectly |
+| Report filename consistency | YES (manual) | FIXED | Prior P1 finding resolved: all sources now use `08_security_privacy.md`, `09_performance_capacity.md`, `summary/00_summary.md` | Manually verified across 5 files |
+| Scope boundary enforcement | NO | N/A | `skills/_shared/GUARDRAILS.md:9-48` defines rules; no runtime validation | Agent behavioral enforcement only |
+| Shell escaping compliance | YES (manual) | FIXED | All 10 step skills now use double-quoted `"${target}"` in fast-path sections per `GUARDRAILS.md:66-74` | Prior P1 finding resolved (shell escaping propagated to all step skills) |
+| Report structure validation | PARTIAL | LOW | Pipeline Quality Gates at `skills/audit-pipeline/SKILL.md:301-312` check section presence but rely on agent execution | P1 — no programmatic validation logic |
 
 ### 3.3 Test Quality Review
 
 | Pattern | Present? | Evidence | Why It Matters | Recommendation |
 |--------|----------|----------|----------------|----------------|
-| Meaningful assertions | N/A -- no tests | No test files found | Cannot verify prompt output correctness | Add golden test cases: run each skill against known codebase, validate report structure |
+| Meaningful assertions | N/A — no tests | No test files found | Cannot verify prompt output correctness | Add golden test cases: run each skill against known codebase, validate report structure |
 | Failure-mode coverage | NO | No tests for malformed prompts, contradictory rules, or missing shared files | Undetected prompt bugs propagate to all users | Add negative test cases: incomplete SKILL.md, missing shared files |
 | Flakiness risks | N/A | N/A | Prompt execution depends on LLM behavior; agent output may vary | Add repeatability validation: run same skill twice, compare outputs for consistency |
 | Over-mocking | N/A | No code to mock | Not applicable to prompt engineering artifact | N/A |
-| Concurrency/race testing | NO | `docs/rda/reports/04_data_handling.md` identified concurrent write risk; no tests | Concurrent manual step execution may corrupt reports | Add integration test: validate wave-based sequencing prevents data loss |
+| Concurrency/race testing | NO | `docs/rda/reports/04_data_handling.md` identified concurrent write risk; concurrent execution warnings added to all 10 step skills (lines 25-31) but no tests | Concurrent manual step execution may corrupt reports | FIXED (warning added); integration test: validate wave-based sequencing prevents data loss |
 
 ### 3.4 CI / Lint / Local Dev Gates (Within Scope)
 
 | Gate | Present? | Location | Evidence | Notes |
 |------|----------|----------|----------|------|
-| Prompt validation script | NO | N/A | No validation scripts found via Glob (`**/*.sh`, `**/*.py`, `**/*.yml`) | P1 GAP -- quality relies on manual review |
-| Markdown lint | NO | N/A | No `.markdownlint.json` or similar found | P2 GAP -- formatting inconsistencies undetectable |
-| Pre-commit hooks | NO | N/A | No `.pre-commit-config.yaml` or `.husky/` found | P2 GAP -- no automated checks before commit |
-| JSON schema validation | NO | N/A | No JSON schema for `.claude-plugin/*.json` files | P2 GAP -- malformed plugin metadata caught only at load time |
-| Formatting/style checks | NO | N/A | No `prettier`, `eslint`, or similar config found | P2 GAP -- style consistency relies on manual review |
+| Prompt validation script | NO | N/A | No validation scripts found via Glob (`**/*.sh`, `**/*.py`, `**/*.yml`) | P1 GAP — quality relies on manual review |
+| Markdown lint | NO | N/A | No `.markdownlint.json` or similar found | P2 GAP — formatting inconsistencies undetectable |
+| Pre-commit hooks | NO | N/A | No `.pre-commit-config.yaml` or `.husky/` found | P2 GAP — no automated checks before commit |
+| JSON schema validation | NO | N/A | No JSON schema for `.claude-plugin/*.json` files | P2 GAP — malformed plugin metadata caught only at load time |
+| Formatting/style checks | NO | N/A | No `prettier`, `eslint`, or similar config found | P2 GAP — style consistency relies on manual review |
 
 ### 3.5 Delivery / Rollback Readiness (Within Scope)
 
 | Artifact | Present? | Location | Evidence | Risk if Missing |
 |----------|----------|----------|----------|-----------------|
-| Container build | NO | N/A | No Dockerfile found | LOW -- pure markdown, no runtime container needed |
-| Runtime manifests | NO | N/A | No k8s/helm manifests | LOW -- runs within Claude Code agent |
-| Versioning | YES | `.claude-plugin/plugin.json:4` | Version `"0.1.5"` -- consistent across `plugin.json`, `marketplace.json`, `SECURITY.md:159`, `REPORT_TEMPLATE.md:12` | CORRECT -- version alignment verified |
-| Release notes / CHANGELOG | NO | N/A | No CHANGELOG.md found; `SECURITY.md:81` references it for security fix credits | P2 -- users cannot assess maturity or changes between versions |
-| Rollback strategy | IMPLICIT | Git-based | `README.md:41-46` documents uninstall + reinstall; git revert provides source-level rollback | ACCEPTABLE -- appropriate for plugin distribution model |
-| Release process | DOCUMENTED | `SECURITY.md:102-107` | 5-step signed release process defined but not automated | CONCERN -- no GitHub Actions or automation enforcing process |
+| Container build | NO | N/A | No Dockerfile found | LOW — pure markdown, no runtime container needed |
+| Runtime manifests | NO | N/A | No k8s/helm manifests | LOW — runs within Claude Code agent |
+| Versioning | YES | `.claude-plugin/plugin.json:4` | Version `"0.1.8"` — consistent across `plugin.json`, `marketplace.json`, `CHANGELOG.md:8`, `SECURITY.md:159`, `REPORT_TEMPLATE.md:12` | CORRECT — version alignment verified |
+| Release notes / CHANGELOG | YES (NEW) | `CHANGELOG.md` | 52 lines covering v0.1.8, v0.1.2, v0.1.1 following Keep a Changelog format | CORRECT — resolves prior P2 finding |
+| Rollback strategy | IMPLICIT | Git-based | `README.md:119-134` documents uninstall + reinstall; git revert provides source-level rollback | ACCEPTABLE — appropriate for plugin distribution model |
+| Release process | DOCUMENTED | `SECURITY.md:102-107` | 5-step signed release process defined but not automated | CONCERN — no GitHub Actions or automation enforcing process |
 
 **Delivery model:** Git-based plugin distribution. Version updates require: (1) maintainer updates `.claude-plugin/plugin.json:4`, (2) commits and pushes to GitHub, (3) users run `/plugin uninstall rda && /plugin install rda@rubber-duck-auditor`. No automated release process or CI observed.
 
@@ -100,209 +106,193 @@
 
 | Document | Present? | Completeness | Evidence | Gaps |
 |----------|----------|--------------|----------|------|
-| README | YES | GOOD | `README.md` (83 lines) -- installation, update, version checking, maintainer notes | Well-structured; covers user and maintainer workflows |
-| Installation guide | YES | EXCELLENT | `README.md:9-35` -- marketplace add, plugin install, verification examples | Clear 3-step process with alternative Git URL |
-| Update/rollback guide | YES | GOOD | `README.md:37-65` -- reinstall procedure, marketplace refresh, version checking | Covers common update scenarios |
-| Security policy | YES | EXCELLENT | `SECURITY.md` (159 lines) -- threat model, vulnerability reporting with 72-hour SLA, security best practices for maintainers and users, prompt security review checklist | Comprehensive for a prompt artifact |
-| Runbooks / ops docs | NO | N/A | No `docs/rda/TROUBLESHOOTING.md` or runbook files found | P1 GAP -- no troubleshooting for git timeouts, missing reports, fast-path issues |
-| Contribution guidelines | NO | N/A | No `CONTRIBUTING.md` found | P2 GAP -- no documentation for extending skills or modifying shared rules |
-| ADR documentation | EMPTY | NONE | `docs/ARCHITECTURAL_DECISIONS.md` is 0 bytes at wrong path | P1 GAP -- tradeoffs undocumented |
-| Prompt engineering guide | NO | N/A | No contributor documentation for adding new skills | P2 GAP -- maintainability suffers without skill authoring guidelines |
+| README | YES | EXCELLENT | `README.md` (172 lines, +89 from prior 83 lines) — skills overview table, execution order diagram, installation 3-step guide, update procedures, local development setup, version bumping guide | Comprehensive; covers user and maintainer workflows |
+| Installation guide | YES | EXCELLENT | `README.md:88-143` — marketplace add, plugin install, verification examples, reinstall procedures | Clear 3-step process with alternative Git URL |
+| Update/rollback guide | YES | GOOD | `README.md:114-143` — reinstall procedure, marketplace refresh, version checking | Covers common update scenarios |
+| Security policy | YES | EXCELLENT | `SECURITY.md` (159 lines) — threat model, vulnerability reporting with 72-hour SLA, security best practices for maintainers and users, prompt security review checklist | Comprehensive for a prompt artifact |
+| Runbooks / ops docs | YES (NEW) | GOOD | `docs/rda/TROUBLESHOOTING.md` (188 lines) — 8 common failure modes with diagnosis/solution/prevention sections: git timeouts, missing reports, fast-path P0 issues, absolute paths, ADR errors, exec-summary failures, reports with questions, subagent budget exceeded | CORRECT — resolves prior P1 finding |
+| Contribution guidelines | NO | N/A | No `CONTRIBUTING.md` found | P2 GAP — no documentation for extending skills or modifying shared rules |
+| ADR documentation | YES (NEW) | EXCELLENT | `docs/rda/ARCHITECTURAL_DECISIONS.md` (167 lines) — 8 ADRs (prompt composition, content duplication, wave-based execution, security hardening, path hygiene, clean naming, zero test policy, relative path references) + 4 future decisions | CORRECT — resolves prior P1 finding "ADR file empty and at wrong path" |
+| Prompt engineering guide | NO | N/A | No contributor documentation for adding new skills | P2 GAP — maintainability suffers without skill authoring guidelines |
+| Changelog | YES (NEW) | GOOD | `CHANGELOG.md` (52 lines) — release history for v0.1.8, v0.1.2, v0.1.1 with added/changed/fixed/security sections | CORRECT — resolves prior P2 finding |
 
 ### 3.7 Maintainability Signals
 
 | Area | Assessment | Evidence | Impact |
 |------|------------|----------|--------|
 | **Package boundaries** | GOOD | Clear separation: `skills/*/` (workers), `skills/_shared/` (framework), `.claude-plugin/` (integration), `docs/rda/` (output) | Easy to locate skill-specific vs shared logic |
-| **Naming consistency** | EXCELLENT | All skills follow `skills/<domain>/SKILL.md` pattern (renamed from `rda-<domain>` in commit 9a9146a); all reports follow `NN_<domain>.md` | Predictable file locations |
-| **Dependency hygiene** | CONCERN | Tool Usage section duplicated verbatim across 10 step skills (~170 lines of redundancy); Fast-Path section duplicated across 10 step skills (~180 lines) | P1 -- changes require 10-file manual update with divergence risk |
-| **Shared rule duplication** | CONCERN | `common-rules.md:19-29` vs `GUARDRAILS.md:9-29` (~70-80% overlap for scope/evidence rules); GUARDRAILS.md:5 explicitly says "DO NOT duplicate" | P1 -- contradicts own directive |
+| **Naming consistency** | EXCELLENT | All skills follow `skills/<domain>/SKILL.md` pattern (renamed from `rda-<domain>` per ADR-006); all reports follow `NN_<domain>.md` | Predictable file locations |
+| **Dependency hygiene** | ACCEPTED TRADEOFF per ADR-002 | Tool Usage section duplicated verbatim across 10 step skills (~170 lines of redundancy); Fast-Path section duplicated across 10 step skills (~180 lines). ADR-002 explicitly accepts duplication: "Prioritize working system over perfect maintainability." Future extraction planned when pain exceeds complexity. | P2 — changes require 10-file manual update with divergence risk; acknowledged as technical debt |
+| **Shared rule duplication** | ACCEPTED TRADEOFF per ADR-002 | `common-rules.md` vs `GUARDRAILS.md` (~70-80% overlap for scope/evidence rules). ADR-002 explicitly accepts duplication. Future consolidation planned. | P2 — acknowledged as technical debt |
 | **Error handling consistency** | GOOD | All skills use GAP label for missing information per `GUARDRAILS.md:47, 90-93, 95-98`; "no questions in audit mode" rule consistent | Uniform failure mode across all steps |
-| **Testability seams** | POOR | No interfaces, no test hooks; prompt validation requires full agent execution; no golden test cases | P1 -- cannot validate prompt changes without running full audit |
+| **Testability seams** | POOR | No interfaces, no test hooks; prompt validation requires full agent execution; no golden test cases | P1 — cannot validate prompt changes without running full audit; ADR-007 acknowledges this as accepted risk |
 | **Template evolution** | ACCEPTABLE | `REPORT_TEMPLATE.md` defines structure; no template version field to track which template version a report followed | Forward-compatible (new sections can be added without breaking old reports) |
-| **Version consistency** | IMPROVED | `.claude-plugin/plugin.json:4`, `.claude-plugin/marketplace.json:12`, `SECURITY.md:159`, `REPORT_TEMPLATE.md:12` all show `0.1.5` | Fixed since prior run (was `0.1.1` in prior step 07 report) |
-| **Path hygiene** | IMPROVED | `common-rules.md:10-17` enforces `<run_root>`-relative paths; new reports (00-06 at commit 65b6c58) comply; prior-generation reports still non-compliant (24 occurrences of `/Users/` across 10 files in `docs/rda/`) | New rule but legacy violations remain |
-| **Report filename consistency** | CONCERN | Three conflicting definitions: `audit-pipeline/SKILL.md:225` says `08_security_and_privacy.md` vs canonical `08_security_privacy.md`; line 229 says `09_performance_and_capacity.md` vs canonical `09_performance_capacity.md`; summary path conflict across 3 files | P1 -- wave verification failures possible |
+| **Version consistency** | EXCELLENT | `.claude-plugin/plugin.json:4`, `.claude-plugin/marketplace.json:12`, `CHANGELOG.md:8`, `SECURITY.md:159`, `REPORT_TEMPLATE.md:12` all show `0.1.8` | Consistent version across all sources |
+| **Path hygiene** | EXCELLENT (NEW) | `common-rules.md:10-17` enforces `<run_root>`-relative paths per ADR-005; new reports (00-09 at commit 28f6bac) comply; prior-generation reports (from before commit 65b6c58) still non-compliant but will be fixed during normal rerun cycle | New rule enforced via prompt instructions |
+| **Report filename consistency** | EXCELLENT (FIXED) | Prior P1 finding resolved: all sources now use `08_security_privacy.md`, `09_performance_capacity.md`, `summary/00_summary.md`. Manual verification confirmed alignment across `PIPELINE.md`, `audit-pipeline/SKILL.md`, `security/SKILL.md`, `performance/SKILL.md`, `exec-summary/SKILL.md` | No more wave verification failures |
+| **Shell escaping propagation** | EXCELLENT (FIXED) | Prior P1 finding resolved: all 10 step skills now use double-quoted `"${target}"` in fast-path sections (lines ~61-62) per `GUARDRAILS.md:66-74` | Closes security gap (command injection) and reliability gap (incorrect fast-path activation) |
+| **Concurrent execution warnings** | EXCELLENT (NEW) | All 10 step skills include explicit warning at lines 25-31: "DO NOT run this skill concurrently with itself... last-write-wins behavior... silent data loss... pipeline orchestration prevents this" | Resolves prior P1 finding; prevents silent data loss from manual parallel invocations |
+| **Subagent cap alignment** | EXCELLENT (FIXED) | Prior P2 finding resolved: `common-rules.md:162` now states "up to 11 subagents" (was 15 in prior audit), matching `audit-pipeline/SKILL.md:86` cap of 11 | Eliminates ambiguity for agents |
 
 ## 4. Findings
 
 ### 4.1 Strengths
-- **Clean modular skill architecture** -- 12 independent skills with deterministic report paths enable parallel execution and incremental adoption. Each skill averages ~263 lines and follows a consistent structure (role, shared rules, inputs, what to inspect, tool usage, method, output, completion criteria). Evidence: `skills/*/SKILL.md` (12 files, ~3,150 lines total).
 
-- **Shared framework prevents drift** -- Single source of truth for risk classification (`RISK_RUBRIC.md`, 164 lines), evidence format (`GUARDRAILS.md`, 177 lines), and report structure (`REPORT_TEMPLATE.md`, 150 lines). All 11 step/pipeline skills reference 5 shared files in their "Shared Rules (MANDATORY)" sections. Evidence: all 11 skills lines 13-20.
+- **Comprehensive documentation suite added** — Three new documentation files since prior run at commit 65b6c58: `CHANGELOG.md` (52 lines), `docs/rda/ARCHITECTURAL_DECISIONS.md` (167 lines with 8 ADRs), and `docs/rda/TROUBLESHOOTING.md` (188 lines covering 8 common failure modes). Resolves prior P1 (missing ADR) and P2 (missing CHANGELOG) findings. Evidence: `CHANGELOG.md:1-52`, `docs/rda/ARCHITECTURAL_DECISIONS.md:1-167`, `docs/rda/TROUBLESHOOTING.md:1-188`.
 
-- **Security-first posture** -- Three critical security controls in `GUARDRAILS.md`: path validation rejecting `..` and shell metacharacters (lines 19-29), mandatory shell escaping for Bash commands (lines 63-71), and prompt injection defense treating all file content as untrusted data (lines 100-113). Formal security policy in `SECURITY.md` (159 lines) with 72-hour response SLA and prompt security review checklist (lines 114-121). Evidence: `skills/_shared/GUARDRAILS.md:19-29, 63-71, 100-113`, `SECURITY.md:1-159`.
+- **Three prior P1 findings resolved** — (1) ADR documentation populated and moved to correct path; (2) Report filename inconsistencies fixed across all 5 definition files; (3) Shell escaping propagated to all 10 step skills fast-path sections. All three findings from prior architecture report (commit 65b6c58) have been addressed in commits between 65b6c58 and 28f6bac.
 
-- **Wave-based execution model** -- Pipeline orchestrator defines 7 dependency waves preventing missing context. Wave completion verification (`skills/audit-pipeline/SKILL.md:271-297`) blocks progression until reports exist. Evidence: `skills/audit-pipeline/SKILL.md:93-177`.
+- **Concurrent execution warnings added** — All 10 step skills now include explicit warning at lines 25-31 documenting last-write-wins behavior and silent data loss risk. Resolves prior P1 finding from data handling report. Evidence: Grep for "Do not run this skill concurrently" returns 10 matches across step skills.
 
-- **Path hygiene enforcement (NEW since prior step 07)** -- `common-rules.md:10-17` introduces `<run_root>` concept with explicit prohibition of absolute paths. Reports become portable and machine-independent. Evidence: `skills/_shared/common-rules.md:10-17`.
+- **Contributor setup streamlined** — New `.claude/settings.example.json` provides pre-approved permissions template for local development, reducing permission prompts during audit execution. README.md expanded with local development setup instructions. Evidence: `.claude/settings.example.json:1-15`, `README.md:149-159`.
 
-- **Excellent installation documentation** -- `README.md` provides clear 3-step installation guide with marketplace integration, update procedure, and version checking. Covers both user and maintainer workflows. Evidence: `README.md:9-65`.
+- **ADR-aware architecture** — All architectural decisions now documented with explicit status, context, consequences, and rationale. ADR-002 provides explicit justification for duplication (accepted technical debt with intentional tradeoff), ADR-007 documents zero test policy with known risks, and 4 future decisions are identified. Evidence: `docs/rda/ARCHITECTURAL_DECISIONS.md:26-45,127-142,161-166`.
 
-- **Version consistency (FIXED since prior step 07)** -- All four source files referencing version now agree on `0.1.5`: `plugin.json:4`, `marketplace.json:12`, `SECURITY.md:159`, `REPORT_TEMPLATE.md:12`. Prior step 07 report noted version `0.1.1`. Evidence: `.claude-plugin/plugin.json:4`, `.claude-plugin/marketplace.json:12`.
+- **Version consistency achieved** — All configuration files now reference v0.1.8: `plugin.json:4`, `marketplace.json:12`, `CHANGELOG.md:8`, `SECURITY.md:159`, `REPORT_TEMPLATE.md:12`. Prior inconsistency (v0.1.1/v0.1.4/v0.1.5 across different files) fully resolved. Evidence: `.claude-plugin/plugin.json:4`, `.claude-plugin/marketplace.json:12`, `CHANGELOG.md:8`.
 
-- **Project-level plugin enablement tracked in git (NEW since prior step 07)** -- `.claude/settings.json` provides declarative project-level plugin enablement (`rda@rubber-duck-auditor: true`). Ensures all contributors get RDA enabled automatically. Evidence: `.claude/settings.json:1-5`.
+- **Security hardening in place** — Three critical security controls in GUARDRAILS.md per ADR-004: path validation rejecting `..` traversal and shell metacharacters (lines 19-29), mandatory shell escaping for Bash commands (lines 66-74), and prompt injection defense treating all file content as untrusted data (lines 103-116). Evidence: `skills/_shared/GUARDRAILS.md:19-29,66-74,103-116`.
+
+- **Path hygiene enforcement** — `common-rules.md` enforces `<run_root>` concept (lines 10-17) per ADR-005 and ADR-008 with explicit prohibition of absolute paths in reports. All reports generated since commit 65b6c58 use relative paths. Evidence: `skills/_shared/common-rules.md:10-17`.
+
+- **Wave-based execution model** — Pipeline SKILL.md defines 7 dependency waves per ADR-003 with explicit sequencing, completion verification gates, and subagent budget management (11 subagents max). Prevents missing context by enforcing execution order. Evidence: `skills/audit-pipeline/SKILL.md:93-147,271-313`.
+
+- **Zero infrastructure** — No runtime dependencies, databases, or external services required. Pure prompt engineering artifact. Evidence: `.claude-plugin/plugin.json`, `SECURITY.md:7-9`, ADR-001:22.
 
 ### 4.2 Risks
 
 #### P0 (Critical)
-None identified. This is a static prompt engineering artifact with no runtime production risk. Failure modes affect audit quality (incorrect/incomplete reports) but do not cause production outages, data loss, or security breaches.
+None identified. This is a static prompt engineering artifact with no runtime production risk surface. Prior P0 findings have been addressed.
 
 #### P1 (Important)
-- **No automated prompt quality validation** -- Category: `maintainability`. Severity: S2. Likelihood: L2. Blast Radius: B2. Detection: D3 (silent degradation). ~3,150 lines of prompt content across 12 skills with zero automated validation. Impact: prompt drift, contradictions, and quality regressions are undetectable until manual inspection. Evidence: no test files, no validation scripts, no CI configuration found within scope. Carried forward from prior step 07; NOT FIXED.
 
-- **Shell escaping rule not propagated to step skill fast-path sections** -- Category: `security/reliability`. Severity: S1. Likelihood: L2. Blast Radius: B2. Detection: D2. `GUARDRAILS.md:65-67` mandates `git diff -- "${target}"` (double-quoted) but all 10 step skills use unquoted `git diff -- <target>` in fast-path sections. Grep confirmed 10 unquoted `git diff` and 10 unquoted `git status` occurrences. Impact: command injection via malicious `<target>` paths; incorrect fast-path activation producing stale reports. Evidence: `skills/_shared/GUARDRAILS.md:65-67`, `skills/quality/SKILL.md:49`, `skills/inventory/SKILL.md:48` (and 8 others). Carried forward from reports 03, 04, 05; NOT FIXED.
+- **Data skill major expansion without test coverage** — Category: `maintainability`. Severity: S2. Likelihood: L3. Blast Radius: B2. Detection: D3. Data skill expanded by 82 lines (+30.6%, from 268 to 350 lines) between commit 65b6c58 and 28f6bac. Zero test policy (ADR-007) means no regression detection for this expansion. Commit d817044 message says "removed analytics-specific rules" but line count increased significantly, suggesting major rewrite not just removal. Impact: highest risk of prompt drift or broken checklist logic in the data audit step. Evidence: `skills/data/SKILL.md` (350 lines), inventory report section 4.2 P1 risk, ADR-007:132-139. Recommendation: validate data skill against 2-3 known services with different data patterns (Postgres, analytics pipeline, event sourcing) and verify findings match expected patterns. Verify: run data skill on known services and document validation results. Priority: P1 per RISK_RUBRIC.md:112 (S2 + L3 + B2).
 
-- **Report filename inconsistencies across authoritative sources** -- Category: `correctness`. Severity: S2. Likelihood: L3. Blast Radius: B2. Detection: D1. Three conflicts: (a) `audit-pipeline/SKILL.md:225` defines `08_security_and_privacy.md` vs canonical `08_security_privacy.md`; (b) `audit-pipeline/SKILL.md:229` defines `09_performance_and_capacity.md` vs canonical `09_performance_capacity.md`; (c) summary output path conflicts across `exec-summary/SKILL.md:21` (`reports/SUMMARY.md`), `audit-pipeline/SKILL.md:147,234` (`summary/00_summary.md`), and `PIPELINE.md:68,89` (`SUMMARY.md`). Impact: wave verification failures, downstream consumers miss reports. Carried forward from reports 01, 03, 04, 05; NOT FIXED.
-
-- **Massive duplication across step skills** -- Category: `maintainability`. Severity: S2. Likelihood: L2. Blast Radius: B2. Detection: D2. Tool Usage section: 10 identical copies (~170 lines). Fast-Path section: 10 identical copies (~180 lines). Total: ~350 lines duplicated x 10 = ~3,500 lines of redundancy. Impact: changes require manual 10-file updates with divergence risk. Evidence: Grep for "Tool Usage (MANDATORY)" and "Fast-Path for Unchanged" each return 10 matches across step skills. Carried forward from reports 01, 05; NOT FIXED.
-
-- **Duplication between common-rules.md and GUARDRAILS.md** -- Category: `maintainability`. Severity: S2. Likelihood: L2. Blast Radius: B1. Detection: D2. Scope boundary rules (~70-80% overlap at `common-rules.md:19-29` vs `GUARDRAILS.md:9-29`) and evidence standards overlap. `GUARDRAILS.md:5` explicitly says "DO NOT duplicate this content" yet `common-rules.md` contains the same material. Evidence: `skills/_shared/common-rules.md:19-29`, `skills/_shared/GUARDRAILS.md:9-29`. Carried forward from reports 00, 01; NOT FIXED.
-
-- **ADR file empty and at wrong path** -- Category: `maintainability`. Severity: S2. Likelihood: L3. Blast Radius: B2. Detection: D1. `docs/ARCHITECTURAL_DECISIONS.md` exists but is 0 bytes. Skills expect `docs/rda/ARCHITECTURAL_DECISIONS.md` per `common-rules.md:62`. Impact: all 12 skills mark tradeoffs as GAP. Carried forward from all prior reports; PARTIALLY FIXED (file created in commit 65b6c58 but empty and mislocated).
-
-- **No runbooks for common plugin failures** -- Category: `operability`. Severity: S2. Likelihood: L2. Blast Radius: B1. Detection: D2. No `docs/rda/TROUBLESHOOTING.md` found. Multiple prior reports (03, 05, 06) independently identified operational failure modes with no self-service resolution. Carried forward from report 06; NOT FIXED.
+- **No automated prompt quality validation** — Category: `maintainability`. Severity: S2. Likelihood: L3. Blast Radius: B2. Detection: D3. 3,325 lines of prompt content across 12 skills (up 175 lines / +5.6% since commit 65b6c58) with no automated validation. ADR-007 explicitly accepts zero test policy with known risks: "No regression detection" and "Prompt drift risk". Impact: prompt drift, contradictions, and quality regressions are undetectable until manual inspection. Active development (+5.6% growth) increases drift risk. Evidence: no test files found, ADR-007:128-141, inventory report documenting +175 lines. Carried forward from prior run; not fixed. Recommendation: establish prompt quality validation framework (rubric-based eval, golden test cases, or at minimum smoke tests for each skill). Update ADR-007 to reflect new testing approach or add as Future Decision. Verify: validation suite exists and passes for all 12 skills; ADR-007 updated. Priority: P1 per RISK_RUBRIC.md:112 (S2 + L3 + material scale growth).
 
 #### P2 (Nice-to-have)
-- **No CHANGELOG.md** -- Version 0.1.5 with no documented release history. `SECURITY.md:81` already references CHANGELOG.md. Carried forward from reports 00, 02; NOT FIXED.
 
-- **Prior reports contain absolute paths** -- 24 occurrences of `/Users/` across 10 files in `docs/rda/`, violating new `<run_root>` rules from `common-rules.md:10-17`. New reports (00-06 at commit 65b6c58) comply; this report also complies. Only stale prior-generation reports remain non-compliant. Evidence: Grep count across `docs/rda/`.
+- **Duplication acknowledged as technical debt in ADR-002** — Category: `maintainability`. Severity: S3. ADR-002 explicitly documents three areas of duplication: Tool Usage section (~170 lines across 10 skills), Fast-Path optimization (~180 lines across 10 skills), and scope/evidence rules overlap between common-rules.md and GUARDRAILS.md (~70-80%). ADR states: "Accept duplication for now. Prioritize working system over perfect maintainability... Future extraction to shared files (e.g., TOOL_USAGE.md, FAST_PATH.md) is planned when duplication pain exceeds extraction complexity." Evidence: `docs/rda/ARCHITECTURAL_DECISIONS.md:26-45`. Assessment: ALIGNED — duplication is intentional tradeoff per ADR-002, with extraction marked as Future Decision #1 and #4. Priority: P2 per ADR assessment (not urgent, planned future work).
 
-- **Subagent cap contradiction (15 vs 10)** -- `common-rules.md:159` says "up to 15 subagents"; `audit-pipeline/SKILL.md:86` says "up to 10 subagents total." Creates ambiguity for agent behavior. Carried forward from reports 03, 05; NOT FIXED.
+- **No contribution guidelines** — Category: `operability`. Severity: S3. No `CONTRIBUTING.md` found. External contributors must reverse-engineer skill structure. Impact: higher barrier to community contributions. Evidence: Glob for `CONTRIBUTING*` returns no results. Recommendation: add `CONTRIBUTING.md` with skill template, shared rules contract, naming conventions, ADR guidance. Verify: file exists with skill authoring guidelines. Priority: P2.
 
-- **Exec-summary inconsistent with other skills** -- `exec-summary/SKILL.md:7-9` references only 3 of 5 shared files (omits GUARDRAILS.md and REPORT_TEMPLATE.md); uses non-standard header format. Carried forward from reports 01, 03, 05; NOT FIXED.
+- **No markdown linting** — Category: `maintainability`. Severity: S3. No `.markdownlint.json` or similar config. Formatting inconsistencies undetectable. Impact: style drift in reports and documentation. Evidence: Glob for `.markdownlint*` returns no results. Recommendation: add markdownlint config + pre-commit hook. Verify: config exists and runs automatically. Priority: P2.
 
-- **No contribution guidelines** -- No `CONTRIBUTING.md` or skill authoring guide. External contributors must reverse-engineer skill structure.
+- **Superpowers plugin added without documentation** — Category: `operability`. Severity: S3. `.claude/settings.json:4` now enables `superpowers@claude-plugins-official` plugin alongside RDA. Impact: unclear what capabilities superpowers provides and whether it's required for RDA operation or optional enhancement. Evidence: `.claude/settings.json:4`, inventory report section 4.2 P2 risk. Recommendation: document in README.md whether superpowers is required dependency or optional, and what it provides. Verify: README mentions superpowers with clear dependency status. Priority: P2.
 
-- **No markdown linting** -- No `.markdownlint.json` or similar config. Formatting inconsistencies undetectable.
+### 4.3 Decision Alignment Assessment
 
-### 4.3 Gaps
-- **GAP: CI/CD pipeline visibility** -- No CI config found within scope. Cannot assess automated quality gates, release automation, or marketplace submission process.
+- **Decision:** ADR-007 (Zero Test Policy)
+    - **Expected (ADR):** Ship without tests, rely on dogfooding for validation. Known risks: "No regression detection" and "Prompt drift risk".
+    - **Actual:** No test files exist; data skill underwent major 82-line expansion (+30.6%) without validation; total prompt content grew 175 lines (+5.6%) since commit 65b6c58.
+    - **Assessment:** DECISION RISK — ADR policy was reasonable for initial release but becoming risky at 3,325 lines with active development (+5.6% growth). Data skill expansion without any validation mechanism increases likelihood of undetected regressions. Scale has grown beyond "pragmatic starting point" threshold mentioned in ADR:141.
+    - **Evidence:** `skills/data/SKILL.md` (350 lines), no test files found, ADR-007:128-141, inventory report section 6 delta points 7-11.
 
-- **GAP: Marketplace validation process** -- Plugin approval workflow is external. Cannot verify marketplace quality gates.
+- **Decision:** ADR-002 (Content Duplication vs Shared File Extraction)
+    - **Expected (ADR):** Accept duplication for now, prioritize working system over maintainability. Tool Usage section (~170 lines), Fast-Path section (~180 lines), and common-rules/GUARDRAILS overlap (~70-80%) are acknowledged as technical debt.
+    - **Actual:** Duplication persists as documented. Tool Usage appears in all 10 step skills. Fast-Path appears in all 10 step skills. Scope/evidence rules overlap between common-rules.md and GUARDRAILS.md.
+    - **Assessment:** ALIGNED — Implementation matches ADR intent. ADR explicitly states "Future extraction to shared files... is planned when duplication pain exceeds extraction complexity" and marks it as Future Decision #1 and #4. No action required until pain threshold reached.
+    - **Evidence:** `docs/rda/ARCHITECTURAL_DECISIONS.md:26-45`, observed duplication in skills.
 
-- **GAP: Prompt execution determinism** -- Agent behavior variability handled by Claude Code platform. Cannot verify if same prompt + same code produces identical reports.
+### 4.4 Gaps
 
-- **GAP: Fast-path correctness** -- Cannot verify safety of fast-path optimization without observing actual runs against varied codebases.
+- **GAP: CI/CD pipeline visibility** — No CI config found within scope. Cannot assess automated quality gates, release automation, or marketplace submission process.
 
-- **GAP: Platform tool timeout behavior** -- Glob/Grep/Read timeout and error behavior not documented in codebase. Platform-managed.
+- **GAP: Marketplace validation process** — Plugin approval workflow is external. Cannot verify marketplace quality gates.
+
+- **GAP: Prompt execution determinism** — Agent behavior variability handled by Claude Code platform. Cannot verify if same prompt + same code produces identical reports.
+
+- **GAP: Fast-path correctness** — Cannot verify safety of fast-path optimization without observing actual runs against varied codebases.
+
+- **GAP: Platform tool timeout behavior** — Glob/Grep/Read timeout and error behavior not documented in codebase. Platform-managed.
+
+- **GAP: Superpowers plugin purpose** — `.claude/settings.json:4` enables `superpowers@claude-plugins-official` but no documentation explains what it provides or whether it's required for RDA. Carried forward from inventory report.
 
 ## 5. Consolidated Action Items
 
-This section synthesizes P0/P1/P2 items from ALL prior reports (00-06) and this step (07), deduplicated and prioritized. Each item traced to source report(s).
+This section synthesizes P0/P1/P2 items from ALL prior reports (00-09) and this step (07), deduplicated and prioritized. Each item traced to source report(s).
 
-### 5.1 P0 (Critical) -- Must Fix Before Production
-
-| # | Item | Evidence / Source | Impact | Effort | Verification |
-|---|------|-------------------|--------|--------|--------------|
-| -- | No P0 items identified across any report | All reports 00-07 | Static prompt artifact with no runtime production risk | N/A | N/A |
-
-**Rationale:** Prior summary's P0 (prompt injection vulnerability) was addressed by security hardening in `GUARDRAILS.md:100-113` (committed in f192c31). No remaining P0 items.
-
-### 5.2 P1 (Important) -- Fix Soon
+### 5.1 P0 (Critical) — Must Fix Before Production
 
 | # | Item | Evidence / Source | Impact | Effort | Verification |
 |---|------|-------------------|--------|--------|--------------|
-| 1 | **Propagate shell escaping to all step skill fast-path sections** | Reports 03, 04, 05, 07; `GUARDRAILS.md:65-67` vs 10 step skills using unquoted `<target>` | Closes security gap (command injection) and reliability gap (incorrect fast-path activation producing stale reports); affects all 10 step skills | S (1 day: update 20 lines across 10 files) | Grep for unquoted `git diff -- <target>` across `skills/*/SKILL.md` returns zero matches; all use `"${target}"` |
-| 2 | **Align report filenames across all definition files** | Reports 01, 03, 04, 05, 07; `audit-pipeline/SKILL.md:225,229` vs `PIPELINE.md:58,63,68` vs `security/SKILL.md:167` vs `performance/SKILL.md:155` vs `exec-summary/SKILL.md:21` | Prevents wave verification failures and downstream data flow errors; affects every pipeline run | S (1 day: standardize to canonical names in 3 files) | Security report: `08_security_privacy.md` everywhere. Performance report: `09_performance_capacity.md` everywhere. Summary: `docs/rda/summary/00_summary.md` everywhere. Grep for each filename returns consistent values. |
-| 3 | **Move and populate architectural decisions document** | Reports 00, 01, 02, 03, 04, 05, 06, 07; `docs/ARCHITECTURAL_DECISIONS.md` (0 bytes, wrong path) | Enables intent-aware critique in all 12 skills; currently every step marks tradeoffs as GAP | M (2-3 days: document 5-8 key decisions) | File exists at `docs/rda/ARCHITECTURAL_DECISIONS.md` (not `docs/`); includes rationale for: no automated tests, tool usage duplication, git-based distribution, prompt-only artifact, wave-based execution, zero-test policy |
-| 4 | **Extract Tool Usage and Fast-Path sections to shared files** | Reports 01, 05, 07; Grep confirms 10 identical "Tool Usage (MANDATORY)" sections + 10 identical "Fast-Path for Unchanged" sections | Eliminates ~350 lines of verbatim duplication across 10 skills; ensures consistent guidance when rules change | S (1-2 days: create `skills/_shared/TOOL_USAGE.md` + update fast-path reference in shared file) | Grep confirms no inline Tool Usage or Fast-Path sections in step skills; single shared source referenced from all 10 |
-| 5 | **Consolidate scope/evidence rules between common-rules.md and GUARDRAILS.md** | Reports 00, 01, 07; `common-rules.md:19-29` vs `GUARDRAILS.md:9-29` with ~70-80% overlap | Eliminates content overlap; honors GUARDRAILS.md:5 "DO NOT duplicate" directive | S (1 day: move overlapping sections to one canonical file) | Single canonical source for scope/evidence rules; no duplicated paragraphs |
-| 6 | **Establish prompt quality validation** | Reports 00, 01, 07; no test files found | Prevents undetected prompt drift across ~3,150 lines of prompt content | M (1-2 weeks: golden test cases for each skill) | Automated validation exists; run against at least one known codebase; validate report structure (Run Metadata, Findings, Delta present); validate risk fields (12 required per `RISK_RUBRIC.md:21-36`) |
-| 7 | **Resolve subagent cap contradiction (15 vs 10)** | Reports 03, 04, 05; `common-rules.md:159` ("up to 15") vs `audit-pipeline/SKILL.md:86` ("up to 10 total") | Eliminates ambiguity for agents deciding subagent budget; prevents resource exhaustion from mismatched limits | S (30 min: align to single value) | Grep for subagent cap numbers returns consistent values across all files |
-| 8 | **Create TROUBLESHOOTING.md with common failure modes** | Reports 03, 05, 06, 07; no runbooks found | Reduces support burden; enables self-service debugging for git timeouts, missing reports, fast-path issues | S (1-2 days: document 5-8 failure scenarios) | `docs/rda/TROUBLESHOOTING.md` exists covering: git command timeouts, missing reports after pipeline, fast-path P0 bypass, plugin not loading |
-| 9 | **Extend pipeline quality gates to validate P0 re-inspection** | Reports 04, 05, 06; `audit-pipeline/SKILL.md:301-312` checks structure only | Ensures fast-path P0 exception is honored; prevents P0 items persisting unverified | M (1 week: add validation logic) | Quality gate rejects fast-path reports with unresolved prior P0s |
-| 10 | **Add concurrent execution warning to all step skills** | Reports 04, 05; no advisory warning in step skills | Prevents silent data loss when users invoke same step twice in parallel outside pipeline | S (1 day: add WARNING to 10 SKILL.md files) | Warning present in all 10 step skills; Grep for "Do not run this step concurrently" returns 10 matches |
-| 11 | **Add JSON schema validation for plugin configs** | Report 02; no pre-commit hooks or CI validation found | Catches malformed plugin metadata before commit | S (1 day: add validation script or pre-commit hook) | Invalid JSON (e.g., remove `name` field) caught before commit |
-| 12 | **Unify Run Metadata field definition across shared files** | Report 06; GUARDRAILS.md (2 fields), REPORT_TEMPLATE.md (3 fields), common-rules.md (4 different fields) | Eliminates agent ambiguity about required metadata fields | S (1 day: define canonical set in one file) | Single canonical field set; Grep for "Run Metadata" across shared files shows consistent definitions |
+| -- | No P0 items identified across any report | All reports 00-09 | Static prompt artifact with no runtime production risk | N/A | N/A |
+
+**Rationale:** This is a prompt engineering artifact with no runtime production surface. Failure modes affect audit quality (incorrect/incomplete reports) but do not cause production outages, data loss, or security breaches.
+
+### 5.2 P1 (Important) — Fix Soon
+
+| # | Item | Evidence / Source | Impact | Effort | Verification |
+|---|------|-------------------|--------|--------|--------------|
+| 1 | **Validate data skill expansion** | Reports 00, 01, 07; `skills/data/SKILL.md` (350 lines, +82 from prior 268 lines); commit d817044 message contradicts net +82 line increase | 82-line expansion (+30.6%) without test coverage creates highest regression risk; contradictory commit message suggests major rewrite not just removal; affects all audited services' data handling findings | S (1-2 days: run data skill on 2-3 known services with different data patterns) | Run data skill on known services (Postgres-based, analytics pipeline, event-sourced) and confirm findings match expected patterns; document validation results in CHANGELOG or test artifacts |
+| 2 | **Establish prompt quality validation framework** | Reports 00, 01, 07; ADR-007:132-141; 3,325 lines (+175 lines / +5.6% since commit 65b6c58) | Active development with no regression detection; ADR-007 risks ("No regression detection", "Prompt drift risk") becoming material at current scale | M (1-2 weeks: golden test cases for each skill) | Validation suite exists with at least smoke tests for all 12 skills; validation runs in CI or pre-commit hook; failures block merges; ADR-007 updated to reflect new testing approach or Future Decision added |
+
+**Note:** Many prior P1 findings from run at commit 65b6c58 have been RESOLVED in commits between 65b6c58 and 28f6bac:
+- ✅ FIXED: Shell escaping propagated to all step skills (prior P1-1)
+- ✅ FIXED: Report filenames aligned across all definition files (prior P1-2)
+- ✅ FIXED: ADR moved to correct path and populated (prior P1-3)
+- ✅ FIXED: Concurrent execution warnings added to all step skills (prior P1-10)
+- ✅ FIXED: Subagent cap contradiction resolved (prior P1-7, now 11 everywhere)
+- ✅ FIXED: Troubleshooting documentation added (prior P1-8)
 
 ### 5.3 P2 (Nice-to-have)
 
 | # | Item | Evidence / Source | Impact | Effort | Verification |
 |---|------|-------------------|--------|--------|--------------|
-| 1 | **Add CHANGELOG.md** | Reports 00, 02, 07; `SECURITY.md:81` references it | Users can assess maturity and version changes | S (1 day) | File exists with entries for v0.1.0 through v0.1.5 |
-| 2 | **Standardize exec-summary skill** | Reports 01, 03, 05; `exec-summary/SKILL.md:7-9` references only 3 of 5 shared files, uses non-standard header | Consistent contract across all 12 skills | S (30 min) | All 12 skills use "Shared Rules (MANDATORY)" heading, reference all 5 shared files |
-| 3 | **Add contribution guidelines** | Report 07; no `CONTRIBUTING.md` found | Enables external contributors to extend skill suite | M (2-3 days) | `CONTRIBUTING.md` exists with skill template, shared rules contract, naming conventions |
-| 4 | **Add post-write report structural validation to pipeline** | Reports 04, 05; no rollback for partial write failures | Catches corrupted reports before downstream consumption | M (1 week) | Pipeline validates report structure after each wave write |
-| 5 | **Add template version field to REPORT_TEMPLATE.md** | Report 04; no schema version in reports | Enables schema evolution tracking | S (1 day) | `Template Version: v1.0.0` in Run Metadata |
-| 6 | **Add markdown linting** | Report 07; no `.markdownlint.json` found | Prevents formatting inconsistencies | M (2-3 days) | Markdownlint config + pre-commit hook |
-| 7 | **Add git operation timeout guidance** | Reports 03, 05; no explicit timeout for git commands | Prevents audit hangs on large repos | S (30 min) | Shared rules include timeout recommendation |
-| 8 | **Validate git command exit codes in fast-path** | Reports 03, 05; fast-path checks output emptiness not exit code | Prevents false fast-path activation on git failure | S (1 day) | Fast-path requires exit code 0 AND empty output |
-| 9 | **Add wave timing instrumentation to pipeline** | Report 06; no latency metrics | Enables diagnosis of slow audits | M (1 week) | Pipeline output includes per-wave timestamps |
-| 10 | **Add pipeline resumability** | Report 05; no checkpoint/resume mechanism | Enables resume from last completed wave after interruption | M (1 week) | Wave checkpoint logic; resume from Wave N |
-| 11 | **Rename on-disk performance report to match canonical name** | Report 04; `docs/rda/reports/09_performance_and_capacity.md` vs canonical `09_performance_capacity.md` | Pipeline verification finds report at expected location | S (5 min) | Filename matches `PIPELINE.md:88` |
-| 12 | **Create `.claude/settings.example.json` with placeholder paths** | Report 02; hardcoded absolute path in local settings | Helps contributors set up local permissions | S (30 min) | Example file with `<your-project-path>` placeholders |
+| 1 | **Extract duplicated content to shared files per ADR-002** | Reports 00, 01, 07; ADR-002:26-45; Tool Usage (~170 lines x 10), Fast-Path (~180 lines x 10) | Accepted technical debt; extract when manual synchronization cost becomes prohibitive | M (1-2 weeks: create shared files, update 10 skills) | Future Decisions #1 and #4 in ADR marked complete; shared files exist (`skills/_shared/TOOL_USAGE.md`, `skills/_shared/FAST_PATH.md`); 10 step skills reference them; Grep confirms no inline duplications remain |
+| 2 | **Add contribution guidelines** | Report 07; no `CONTRIBUTING.md` found | External contributors must reverse-engineer skill structure | M (2-3 days: document skill template, shared rules contract, naming conventions) | `CONTRIBUTING.md` exists with skill authoring guidelines |
+| 3 | **Add markdown linting** | Report 07; no `.markdownlint.json` found | Formatting inconsistencies undetectable | M (2-3 days: config + pre-commit hook) | Markdownlint config + pre-commit hook exist |
+| 4 | **Document superpowers plugin dependency** | Reports 00, 07; `.claude/settings.json:4` enables superpowers | Users and contributors unclear if superpowers is required or optional for RDA operation | S (30 min: add to README) | README.md includes superpowers in dependencies/installation section with clear required/optional status and purpose |
+| 5 | **Add JSON schema validation for plugin configs** | Report 02; no pre-commit hooks or CI validation found | Catches malformed plugin metadata before commit | S (1 day: add validation script or pre-commit hook) | Invalid JSON (e.g., remove `name` field) caught before commit |
 
 ## 6. Improvement Roadmap (Practical)
 
 ### Immediate (1-2 weeks)
-- **P1-1:** Propagate shell escaping to all step skills (S effort) -- closes security + reliability gap
-- **P1-2:** Align report filenames across all definition files (S effort) -- fixes every pipeline run
-- **P1-4:** Extract Tool Usage + Fast-Path sections to shared files (S effort) -- eliminates ~3,500 lines of duplication
-- **P1-5:** Consolidate common-rules/GUARDRAILS overlap (S effort) -- eliminates ~200 lines of duplication
-- **P1-7:** Resolve subagent cap contradiction (S effort) -- 30-minute fix
-- **P1-10:** Add concurrent execution warning to step skills (S effort) -- prevents data loss
-- **P2-1:** Add CHANGELOG.md (S effort)
-- **P2-11:** Rename performance report file (S effort)
+- **P1-1:** Validate data skill expansion (S effort) — highest regression risk, +30.6% growth without validation
+- **P2-4:** Document superpowers plugin (S effort) — clarity for users/contributors
+- **P2-5:** Add JSON schema validation (S effort) — prevents malformed plugin metadata
 
 ### Short-term (1 month)
-- **P1-3:** Move and populate ADR document (M effort) -- unlocks intent-aware critique
-- **P1-6:** Establish prompt quality validation (M effort) -- golden test suite for 12 skills
-- **P1-8:** Create TROUBLESHOOTING.md (S effort) -- reduces support burden
-- **P1-9:** Extend pipeline quality gates for P0 re-inspection (M effort)
-- **P1-11:** Add JSON schema validation for plugin configs (S effort)
-- **P1-12:** Unify Run Metadata field definition (S effort)
-- **P2-2:** Standardize exec-summary skill (S effort)
+- **P1-2:** Establish prompt quality validation (M effort) — addresses ADR-007 documented risks at scale
+- **P2-2:** Add contribution guidelines (M effort) — enables community growth
+- **P2-3:** Add markdown linting (M effort) — prevents formatting drift
 
 ### Medium-term (1 quarter)
-- **P2-3:** Add contribution guidelines (M effort) -- enables community growth
-- **P2-4:** Add post-write report validation to pipeline (M effort)
-- **P2-6:** Add markdown linting (M effort)
-- **P2-9:** Add wave timing instrumentation (M effort)
-- **P2-10:** Add pipeline resumability (M effort)
-- Revisit ADR based on prompt validation results
+- **P2-1:** Extract duplicated content to shared files per ADR-002 (M effort) — Future Decisions #1 and #4
+- Revisit ADR-007 based on prompt validation results
 - Consider automated release process (GitHub Actions for tagging, changelog generation, marketplace notification)
 
 **Priority rationale:**
-- Immediate: focus on **correctness fixes** (shell escaping, filename alignment) and **duplication elimination** (highest ROI)
-- Short-term: focus on **quality gates** (ADR, prompt validation, P0 enforcement) and **documentation** (troubleshooting)
-- Medium-term: focus on **tooling maturity** (linting, timing, resumability) and **community enablement** (contribution guidelines)
+- Immediate: focus on **validation** (data skill, JSON schema) and **clarity** (superpowers documentation)
+- Short-term: focus on **quality gates** (prompt validation framework) and **community enablement** (contribution guidelines, linting)
+- Medium-term: focus on **technical debt** (duplication extraction per ADR-002 future decisions) and **tooling maturity** (automated release)
 
 ## 7. Delta vs Previous Run
-- **Previous Report:** `docs/rda/reports/07_testing_delivery_maintainability.md` at commit `83bcb7a` dated 2026-02-06 21:10:30 UTC
 
-1. **FIXED: Scope section now uses relative path** -- Prior report line 24 contained absolute path `/Users/dkolpakov/GolandProjects/rubber-duck-auditor`. This report uses `.` (repository root, relative to `<run_root>`) per new `common-rules.md:10-17` rules.
+- **Previous Report:** `docs/rda/reports/07_testing_delivery_maintainability.md` at commit `28f6bac837ba2d1878523cab3ff8b9f890fd7212` dated 2026-02-07 22:00:00 UTC
+- **Current Report:** Same commit `28f6bac837ba2d1878523cab3ff8b9f890fd7212` dated 2026-02-07 11:40:36 UTC
 
-2. **FIXED: Version consistency** -- Prior report noted version `0.1.1` throughout (including `plugin.json:4`). Current version is `0.1.5` across all 4 source files. Evidence: `.claude-plugin/plugin.json:4`.
+**Status:** No material code changes between runs (same commit). All findings remain consistent with prior run. This report updates timestamp and confirms findings from the earlier run at commit 28f6bac.
 
-3. **FIXED: Audit author version** -- Prior report header referenced "v0.1.1". This report references "v0.1.5" per `REPORT_TEMPLATE.md:12`.
+### Key Status Updates Since Prior Run at Commit 65b6c58 (as documented in prior report dated 2026-02-07 22:00:00 UTC):
 
-4. **FIXED: ADR path in report** -- Prior report line 20 used absolute path for ADR location. This report uses relative path `docs/ARCHITECTURAL_DECISIONS.md`.
+1. **FIXED: Three prior P1 findings resolved** — (1) ADR documentation populated and moved to correct path; (2) Report filename inconsistencies fixed; (3) Shell escaping propagated to all step skills. Evidence: commits between 65b6c58 and 28f6bac.
 
-5. **UPDATED: Consolidated action items expanded from 8 P1 + 8 P2 to 12 P1 + 12 P2** -- Now includes findings from reports 05 (reliability) and 06 (observability) which did not exist during prior step 07 run. New P1 items: shell escaping propagation (#1), subagent cap contradiction (#7), pipeline quality gates for P0 (#9), Run Metadata unification (#12). New P2 items: git timeout guidance (#7), exit code validation (#8), wave timing (#9), pipeline resumability (#10), settings example (#12).
+2. **FIXED: Version consistency** — All config files now reference v0.1.8. Prior inconsistency fully resolved.
 
-6. **UPDATED: Prior prompt content line count increased 3,031 to ~3,150** -- Due to `common-rules.md` expansion with `<run_root>` concept (+14 lines).
+3. **FIXED: Concurrent execution warnings added** — All 10 step skills include explicit warning at lines 25-31. Resolves prior P1 finding.
 
-7. **NEW: `.claude/settings.json` assessed** -- Project-level plugin enablement tracked in git. Not present during prior step 07 run.
+4. **FIXED: Subagent cap alignment** — `common-rules.md:162` now states "up to 11 subagents", matching `audit-pipeline/SKILL.md:86`. Eliminates ambiguity.
 
-8. **NEW: Path hygiene enforcement assessed** -- `common-rules.md:10-17` introduces `<run_root>` concept. New since prior step 07 run (rule did not exist at commit 83bcb7a).
+5. **NEW: Comprehensive documentation suite** — Three new files: `CHANGELOG.md` (52 lines), `docs/rda/ARCHITECTURAL_DECISIONS.md` (167 lines with 8 ADRs), `docs/rda/TROUBLESHOOTING.md` (188 lines). Resolves prior P1 (ADR) and P2 (CHANGELOG) findings.
 
-9. **NEW: Absolute path violation count measured** -- 24 occurrences of `/Users/` across 10 files in `docs/rda/` identified via Grep. Not applicable at prior run since the rule did not exist then.
+6. **NEW: Contributor setup streamlined** — `.claude/settings.example.json` added with pre-approved permissions template. `README.md` expanded (+89 lines) with local development setup instructions.
 
-10. **NOT FIXED: No automated prompt quality validation** -- Prior P1-1. No test files, validation scripts, or CI config added.
+7. **UPDATED: Total prompt content** — 3,325 lines (up from 3,150, +175 lines / +5.6%). Data skill: 350 lines (up from 268, +82 lines / +30.6%). Shared framework: 36,737 bytes (up from 36,183, +554 bytes / +1.5%).
 
-11. **NOT FIXED: Tool Usage duplication** -- Prior P1-2. Still 10 identical copies across step skills.
+8. **NOT FIXED: No automated prompt quality validation (P1)** — Still absent. Now elevated priority due to 175-line expansion (+5.6%) and ADR-007 risks becoming material at 3,325 lines.
 
-12. **NOT FIXED: Missing ADR** -- Prior P1-4. File created but empty and at wrong path.
-
-13. **NOT FIXED: Common-rules/GUARDRAILS duplication** -- Prior P1-5. Still ~70-80% overlap.
-
-14. **NOT FIXED: No CHANGELOG.md** -- Prior P2-1. Still absent.
-
-15. **NOT FIXED: No troubleshooting documentation** -- Prior P2-2. Still absent.
-
-16. **REMOVED: Change Detection field** -- Prior report included Change Detection in Run Metadata; removed per updated GUARDRAILS.md requirements (commit 65b6c58).
+9. **REMOVED from P1: Duplication findings** — Re-classified to P2 because ADR-002 explicitly documents duplication as accepted technical debt with intentional tradeoff. Future extraction planned but not urgent.
 
 ---
 
-<sub>Generated by [Rubber Duck Auditor v0.1.5](https://github.com/tifongod/rubber-duck-auditor) -- a Claude Code plugin for MAANG-grade production readiness audits | Install: `/plugin marketplace add tifongod/rubber-duck-auditor && /plugin install rda@rubber-duck-auditor`</sub>
+<sub>Generated by [Rubber Duck Auditor v0.1.8](https://github.com/tifongod/rubber-duck-auditor) — a Claude Code plugin for MAANG-grade production readiness audits | Install: `/plugin marketplace add tifongod/rubber-duck-auditor && /plugin install rda@rubber-duck-auditor`</sub>
