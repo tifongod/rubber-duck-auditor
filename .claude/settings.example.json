@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(rg:*)",
+      "Bash(ls:*)",
+      "Bash(done)",
+      "Bash(for file in skills/{config,integrations,data,reliability,observability,quality,security,performance}/SKILL.md)",
+      "Bash(do echo \"Updating $file...\")",
+      "Bash(wc:*)",
+      "Bash(git -C <your-project-path> status --short)",
+      "Bash(git -C <your-project-path> diff --stat)"
+    ]
+  }
+}

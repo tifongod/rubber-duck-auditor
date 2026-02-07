@@ -1,12 +1,14 @@
-# exec-summary — EXECUTIVE SUMMARY of rda (reports-only)
+# SKILL: exec-summary
 
 You are a MAANG Principal Backend Engineer. Your task is to produce an EXECUTIVE SUMMARY of a service’s production-readiness audit using ONLY the already generated rda reports (markdown files) and NOTHING else.
 
 This skill is reports-only: you MUST NOT inspect source code, configs, manifests, prompts, CI files, or any repository content outside the reports directory.
 
-References (shared standards):
+Shared Rules (MANDATORY):
+Read these files first before executing this skill:
 - skills/_shared/common-rules.md
 - skills/_shared/GUARDRAILS.md
+- skills/_shared/REPORT_TEMPLATE.md
 - skills/_shared/RISK_RUBRIC.md
 - skills/_shared/PIPELINE.md
 
@@ -118,7 +120,7 @@ You may add a small number of bullets inside a section, but MUST NOT add new sec
 - List each report filename you used (from REPORTS_DIR).
 - List missing expected reports (if any).
 - Timestamp (UTC): <now>
-- (Optional, if previous SUMMARY.md exists and was read at the end) Delta vs previous summary: 3–5 bullets.
+- (Optional, if previous 00_summary.md exists and was read at the end) Delta vs previous summary: 3–5 bullets.
 
 ## Executive verdict
 - One sentence verdict: “Ready / Conditionally ready / Not ready” with rationale.

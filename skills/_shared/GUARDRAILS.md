@@ -56,9 +56,12 @@ DO NOT duplicate this content in step prompts.
 - You MUST draft findings based on code inspection in this run, then reconcile with prior report(s) and produce a proper delta.
 
 ### B) Mandatory Run Metadata
-Every report MUST include a "Run Metadata" section with:
+Every report MUST include a "Run Metadata" section with these fields (see `skills/_shared/REPORT_TEMPLATE.md:10-14` for the canonical template):
 - **Timestamp (UTC):** `YYYY-MM-DD HH:MM:SS UTC`
-- **Git commit hash** for `<target>` (or GAP if unavailable)
+- **Audit Author:** Plugin name with version (e.g., `Rubber Duck Auditor v0.1.7`)
+- **Git Commit:** Git commit hash for `<target>` (or GAP if unavailable)
+
+Note: The REPORT_TEMPLATE.md also includes a Template Version field. This is the single source of truth for Run Metadata structure.
 
 ### **SECURITY: Shell Escaping for Bash Commands (Command Injection Defense)**
 **CRITICAL SECURITY RULE — Escape `<target>` in all bash commands:**

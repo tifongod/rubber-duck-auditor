@@ -23,6 +23,16 @@ If anything below conflicts with shared rules, shared rules win.
 
 ---
 
+## ⚠️ Concurrent Execution Warning
+
+**DO NOT run this skill concurrently with itself.** Running the same step multiple times in parallel will cause last-write-wins behavior where the second run silently overwrites the first run's report with no conflict detection. This results in silent data loss.
+
+If you need to re-run this step, wait for the current execution to complete before starting a new one.
+
+(This warning does not apply to pipeline-orchestrated runs, which use wave-based sequencing to prevent concurrent writes.)
+
+---
+
 ## Inputs
 
 - `<target>` (optional): service root directory. If not provided, use `.`.
@@ -45,8 +55,8 @@ If anything below conflicts with shared rules, shared rules win.
 ### Fast-Path for Unchanged Target
 
 If **both** of the following are true:
-1. `git diff -- <target>` returns empty (no uncommitted changes)
-2. `git status --porcelain -- <target>` returns empty (no untracked files)
+1. `git diff -- "${target}"` returns empty (no uncommitted changes)
+2. `git status --porcelain -- "${target}"` returns empty (no untracked files)
 
 Then you MAY take the fast-path:
 - Read the previous report for this step (if exists)

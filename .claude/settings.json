@@ -1,5 +1,6 @@
 {
   "enabledPlugins": {
-    "rda@rubber-duck-auditor": true
+    "rda@rubber-duck-auditor": true,
+    "superpowers@claude-plugins-official": true
   }
 }

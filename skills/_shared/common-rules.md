@@ -16,25 +16,20 @@ All step-specific prompts must **reference and follow** these rules.
     - no machine-specific home paths
 - If a tool returns paths like `./internal/app/server.go`, normalize by stripping the leading `./`.
 
-### Target directory (`<target>`)
-- The audit operates on a **single directory scope**: `<target>` is the **root boundary**.
-- The agent must analyze **everything inside `<target>` and all subdirectories**.
-- The agent **must not** read, search, infer, or reference files **outside** `<target>`.
-
-### Default scope
-- If `<target>` is not provided, the agent must use `.` as `<target>` **relative to `<run_root>`**.
-
-### No scope expansion
-- Do not "peek" into parent folders, sibling services, or repository-wide docs unless they are **inside `<target>`**.
-- If something seems missing, call it out as a **gap** rather than expanding scope.
+### Scope boundary rules
+- See `skills/_shared/GUARDRAILS.md` section 1 for complete scope boundary rules (target directory, default scope, path validation, prohibited actions).
+- Key principle: `<target>` is the hard boundary; analyze everything within it, nothing outside it.
 
 ### Tool usage for scope enforcement
 - ✅ DO: Use Glob with narrow patterns: `internal/*/`, `cmd/*/main.go`, `**/*.go` (specific extension)
 - ✅ DO: Use Grep with file type filters: `--type go`, `--glob "*.yaml"`
 - ✅ DO: Use Read tool directly for known file paths
+- ✅ DO: Use Bash tool for git commands and system operations (default timeout: 120 seconds / 2 minutes)
 - ❌ DON'T: Use Bash `ls -R`, `find .`, or other recursive listing commands
 - ❌ DON'T: Use Glob `**/*` without extension filter (too broad, lists everything)
 - ❌ DON'T: Read files without verifying path starts with `<target>/`
+
+**Note:** The Bash tool has a default timeout of 120,000ms (2 minutes). For long-running operations on large repositories, consider adding an explicit timeout parameter or marking the operation as GAP if it exceeds this limit.
 
 ---
 
@@ -156,7 +151,7 @@ The report must be written as an **iterative update**:
 
 ## 8) Subagents (Optional Parallelization)
 
-The agent **MAY** spawn up to **15 subagents** to improve throughput and depth of analysis (e.g., parallel inspection of different areas, cross-checking prior findings, building action-item drafts).
+The agent **MAY** spawn up to **11 subagents** to improve throughput and depth of analysis (e.g., parallel inspection of different areas, cross-checking prior findings, building action-item drafts).
 
 ### Hard constraints for subagents
 - **Same boundary:** subagents must treat `<target>` as a hard scope boundary (no reads/search outside `<target>`).
@@ -180,10 +175,12 @@ The agent **MAY** spawn up to **15 subagents** to improve throughput and depth o
 Every report should contain, at minimum:
 
 1. **Run Metadata**
-- `<run_root>`
-- `<target>`
-- audit step name
-- date/time
+   - Use the canonical structure from `skills/_shared/REPORT_TEMPLATE.md:10-14`:
+     - Timestamp (UTC)
+     - Audit Author (with version)
+     - Git Commit
+     - Template Version
+   - See REPORT_TEMPLATE.md for the authoritative structure
 2. **Executive Summary**
 - key risks + readiness verdict (brief)
 3. **Delta vs Previous Run**
@@ -206,4 +203,4 @@ Every report should contain, at minimum:
 - [ ] Write a Markdown report into `docs/rda/reports`.
 - [ ] Evidence-first, delta-first, no speculative “fixed”.
 - [ ] All paths in the report are relative to `<run_root>` (no absolute paths, no `./` prefix).
-- [ ] (Optional) If using subagents: max 15, same `<target>` boundary, no file writes; main agent consolidates and owns final output.
+- [ ] (Optional) If using subagents: max 11, same `<target>` boundary, no file writes; main agent consolidates and owns final output.

@@ -146,13 +146,25 @@ After updating, verify the version in any generated report's metadata section, o
 - **Plugin caching:** Claude Code copies the plugin directory to a cache. The plugin must not depend on files outside its source directory.
 - **Skills location:** All skills are located in the `skills/` directory.
 
-## For Maintainers
+## For Maintainers and Contributors
+
+### Local Development Setup
+
+If you're contributing to RDA or running it locally, you may want to configure Claude Code permissions for faster development:
+
+1. Copy `.claude/settings.example.json` to `.claude/settings.local.json`
+2. Replace `<your-project-path>` with the absolute path to your cloned repository
+3. The `.claude/settings.local.json` file is gitignored and user-specific
+
+This pre-approves common read-only operations (git status, grep, test commands) to reduce permission prompts during audit execution.
 
 ### Bumping versions
 
 1. Update the version in `.claude-plugin/plugin.json`
-2. Commit and push changes
-3. Users will need to reinstall or update the plugin to get the new version
+2. Update the version in `.claude-plugin/marketplace.json`
+3. Update the version in `CHANGELOG.md` with release notes
+4. Commit and push changes
+5. Users will need to reinstall or update the plugin to get the new version
 
 ### Adding more plugins
 

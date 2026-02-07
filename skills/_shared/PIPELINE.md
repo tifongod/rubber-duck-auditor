@@ -65,7 +65,7 @@ Important:
 
 11) **summary**
 - Goal: executive summary + top risks + prioritized improvement plan (consolidation).
-- Output: `SUMMARY.md`
+- Output: `00_summary.md`
 - Consumes: all reports 00–09.
 
 ---
@@ -86,7 +86,9 @@ Expected files in `<target>/docs/rda/reports/`:
 - `07_testing_delivery_maintainability.md`
 - `08_security_privacy.md`
 - `09_performance_capacity.md`
-- `SUMMARY.md`
+
+Expected file in `<target>/docs/rda/summary/`:
+- `00_summary.md`
 
 ---
 

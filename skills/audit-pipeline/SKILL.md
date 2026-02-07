@@ -83,10 +83,10 @@ If `/clear` is unavailable or ineffective, treat it as **GAP** and fall back to 
 
 ## Subagent Budget (MANDATORY CAP)
 
-- You may spawn **up to 10 subagents total** per full pipeline run.
+- You may spawn **up to 11 subagents total** per full pipeline run.
 - With wave-based execution (see below), you will spawn **at most 3 concurrent subagents per wave**.
-- Total subagents needed: 10 steps + 1 summary = 11, but summary can share with step 09.
-- Within a step, you may spawn additional "micro-subagents" ONLY if you stay within the global cap of 10.
+- Total subagents needed: 10 steps + 1 summary = 11.
+- Within a step, you may spawn additional "micro-subagents" ONLY if you stay within the global cap of 11.
 
 ---
 
@@ -174,7 +174,7 @@ Steps MUST be executed in **dependency waves** to ensure later steps can consume
 7. Spawn subagent for Executive Summary → wait → verify summary/00_summary.md exists
 ```
 
-**Total subagents:** 10 (within budget)
+**Total subagents:** 11 (1+2+1+2+1+3+1)
 
 ---
 
@@ -338,4 +338,4 @@ A full pipeline run is complete only if:
 - No scope boundary violations occurred
 - No external code was opened
 - Reports follow shared template constraints (including "no inspected files" verbosity)
-- Total subagent count did not exceed 10
+- Total subagent count did not exceed 11
